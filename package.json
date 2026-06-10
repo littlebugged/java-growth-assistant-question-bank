@@ -6,7 +6,8 @@
   "scripts": {
     "clean": "tsx scripts/clean.ts",
     "clean:all": "tsx scripts/clean.ts --all",
-    "clean:push": "tsx scripts/clean.ts --all && git add -A && git commit -m 'chore: 更新题库数据' && git push"
+    "clean:push": "tsx scripts/clean.ts --all && git add -A && git commit -m 'chore: 更新题库数据' && git push",
+    "generate": "tsx scripts/generate-rule.ts"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,8 @@
   },
   "homepage": "https://github.com/littlebugged/java-growth-assistant-question-bank#readme",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
+    "dotenv": "^17.4.2",
     "glob": "^13.0.6",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.2.0"

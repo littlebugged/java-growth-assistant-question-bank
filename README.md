@@ -11,6 +11,7 @@ interview/           # 面试宝典题库
 assessment/          # 技能评估题库
 scripts/
   clean.ts           # 数据清洗脚本
+  generate-rule.ts   # AI 规则生成器
   rules/             # 清洗规则配置
     example-json.json
     example-markdown.json
@@ -110,6 +111,67 @@ npm run clean:push
 ```
 
 支持：`minLength`, `maxLength`, `contains`, `notContains`, `in`, `notIn`, `regex`
+
+---
+
+## AI 规则生成器
+
+不想手写规则？让 AI 帮你分析仓库，自动生成清洗规则。
+
+### 配置
+
+```bash
+# 复制环境变量模板
+cp .env.example .env
+
+# 编辑 .env，填入 Claude API Key
+ANTHROPIC_API_KEY=your-api-key-here
+```
+
+API Key 从 https://console.anthropic.com/ 获取。
+
+### 使用
+
+```bash
+# 分析仓库并生成规则
+npm run generate -- https://github.com/Snailclimb/JavaInterview
+
+# 生成的规则会保存到 rules/auto-{repo-name}.json
+# 然后执行清洗
+npm run clean -- rules/auto-JavaInterview.json
+```
+
+### 工作流程
+
+```
+输入 GitHub URL
+  → 克隆仓库（浅克隆）
+  → 扫描文件结构 + 抽样读取
+  → Claude AI 分析数据格式
+  → 判断能否清洗 + 生成规则 JSON
+  → 保存到 rules/auto-xxx.json
+  → 提示执行清洗命令
+```
+
+### 示例
+
+```bash
+$ npm run generate -- https://github.com/example/interview-questions
+
+⬇️  克隆仓库: https://github.com/example/interview-questions
+📄 找到 156 个文件
+📊 文件类型: .json(12), .md(140), .txt(4)
+📋 抽样了 4 个文件
+🤖 正在分析仓库结构和数据格式...
+
+✅ 分析完成!
+
+📦 仓库: https://github.com/example/interview-questions
+📁 规则文件: rules/auto-interview-questions.json
+
+💡 执行清洗:
+   npm run clean -- rules/auto-interview-questions.json
+```
 
 ## 如何贡献
 
