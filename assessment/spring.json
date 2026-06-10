@@ -1,0 +1,602 @@
+[
+  {
+    "id": "sp-01",
+    "dimension": "spring",
+    "difficulty": "basic",
+    "title": "Spring Bean 的默认作用域是？",
+    "options": [
+      {
+        "label": "prototype",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "singleton",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "request",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "session",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "默认 singleton，整个容器只有一个实例。prototype 每次获取新实例。"
+  },
+  {
+    "id": "sp-02",
+    "dimension": "spring",
+    "difficulty": "intermediate",
+    "title": "@Transactional 默认对哪种异常回滚？",
+    "options": [
+      {
+        "label": "所有异常",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "只对 RuntimeException 回滚",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "只对 checked 异常回滚",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "不自动回滚",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "默认只对 RuntimeException 和 Error 回滚。需要 @Transactional(rollbackFor = Exception.class)。"
+  },
+  {
+    "id": "sp-03",
+    "dimension": "spring",
+    "difficulty": "intermediate",
+    "title": "Spring AOP 默认用哪种代理方式（Spring Boot 2.x+）？",
+    "options": [
+      {
+        "label": "JDK 动态代理",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "CGLIB",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "AspectJ 编译期织入",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "Javassist",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "Spring Boot 2.x 默认 proxyTargetClass=true，使用 CGLIB 代理（基于继承）。"
+  },
+  {
+    "id": "sp-04",
+    "dimension": "spring",
+    "difficulty": "intermediate",
+    "title": "Spring 解决循环依赖用到几级缓存？",
+    "options": [
+      {
+        "label": "1 级",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "2 级",
+        "value": "b",
+        "score": 2
+      },
+      {
+        "label": "3 级",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "无法解决循环依赖",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "三级缓存：singletonObjects、earlySingletonObjects、singletonFactories。只能解决 setter 注入的循环依赖。"
+  },
+  {
+    "id": "sp-05",
+    "dimension": "spring",
+    "difficulty": "basic",
+    "title": "@Autowired 和 @Resource 的注入顺序？",
+    "options": [
+      {
+        "label": "都是先按名称再按类型",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "@Autowired 按类型，@Resource 按名称",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "都是按类型",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "@Autowired 按名称，@Resource 按类型",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "@Autowired 先按类型。@Resource 先按名称，找不到再按类型。"
+  },
+  {
+    "id": "sp-06",
+    "dimension": "spring",
+    "difficulty": "intermediate",
+    "title": "Spring Boot 的 @ConditionalOnClass 作用是？",
+    "options": [
+      {
+        "label": "当指定类存在时才创建 Bean",
+        "value": "a",
+        "score": 4
+      },
+      {
+        "label": "当指定类不存在时才创建 Bean",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "当指定类被继承时才创建 Bean",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "没有这个注解",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "a",
+    "explanation": "@ConditionalOnClass 表示当 classpath 中存在指定类时，配置类才生效。"
+  },
+  {
+    "id": "sp-07",
+    "dimension": "spring",
+    "difficulty": "intermediate",
+    "title": "Spring 事件监听支持异步吗？",
+    "options": [
+      {
+        "label": "不支持",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "支持，加 @Async 注解即可",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "需要用 MQ",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "只有 WebFlux 支持",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "在 @EventListener 方法上加 @Async，事件就会异步处理。需要 @EnableAsync。"
+  },
+  {
+    "id": "sp-08",
+    "dimension": "spring",
+    "difficulty": "basic",
+    "title": "Spring Cloud Gateway 基于什么框架？",
+    "options": [
+      {
+        "label": "Servlet",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "Spring WebFlux（响应式）",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "Netty 直接实现",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "Spring MVC",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "Gateway 基于 Spring WebFlux + Reactor，非阻塞。底层用 Netty。"
+  },
+  {
+    "id": "sp-09",
+    "dimension": "spring",
+    "difficulty": "advanced",
+    "title": "Spring 循环依赖中，构造器注入能解决吗？",
+    "options": [
+      {
+        "label": "能",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "不能，构造器注入需要完整对象，无法提前暴露引用",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "用 @Lazy 可以解决",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "只有 prototype 作用域不能解决",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "三级缓存只能解决 setter 注入。构造器注入在创建时就需要对方的完整对象。"
+  },
+  {
+    "id": "sp-10",
+    "dimension": "spring",
+    "difficulty": "advanced",
+    "title": "Spring WebFlux 不能使用以下哪个？",
+    "options": [
+      {
+        "label": "Mono/Flux",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "JDBC（阻塞式数据库访问）",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "WebClient",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "R2DBC",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "WebFlux 是非阻塞的，不能使用 JDBC。需要用 R2DBC。"
+  },
+  {
+    "id": "sp-11",
+    "dimension": "spring",
+    "difficulty": "intermediate",
+    "title": "以下代码中，@Transactional 会生效吗？\n\n@Service\npublic class UserService {\n    public void createUser() {\n        this.saveUser();\n    }\n    @Transactional\n    public void saveUser() { ... }\n}",
+    "options": [
+      {
+        "label": "会生效",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "不会，自调用不走代理",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "只有 CGLIB 代理才生效",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "需要加 @EnableTransactionManagement",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "this.saveUser() 是直接方法调用，不经过 Spring 代理对象，@Transactional 不会生效。"
+  },
+  {
+    "id": "sp-12",
+    "dimension": "spring",
+    "difficulty": "intermediate",
+    "title": "Spring Bean 的初始化顺序？",
+    "options": [
+      {
+        "label": "构造方法 → @Autowired → @PostConstruct → InitializingBean",
+        "value": "a",
+        "score": 4
+      },
+      {
+        "label": "@Autowired → 构造方法 → @PostConstruct",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "随机顺序",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "只有构造方法",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "a",
+    "explanation": "Bean 生命周期：构造方法 → 依赖注入 → @PostConstruct → InitializingBean.afterPropertiesSet。"
+  },
+  {
+    "id": "sp-13",
+    "dimension": "spring",
+    "difficulty": "basic",
+    "title": "以下哪种注入方式不可行？",
+    "options": [
+      {
+        "label": "构造器注入",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "Setter 注入",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "字段注入（@Autowired）",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "静态方法注入",
+        "value": "d",
+        "score": 4
+      }
+    ],
+    "answer": "d",
+    "explanation": "Spring 不能注入静态字段或静态方法。静态成员属于类而不属于实例。"
+  },
+  {
+    "id": "sp-14",
+    "dimension": "spring",
+    "difficulty": "advanced",
+    "title": "Spring 的 @Scope(\"prototype\") Bean 被 @Autowired 注入后，每次调用都是新实例吗？",
+    "options": [
+      {
+        "label": "是的",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "不是，注入时就确定了，后续是同一个实例",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "取决于配置",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "会报错",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "prototype Bean 在注入时只创建一次。需要每次获取新实例用 @Lookup 或 ObjectFactory<T>。"
+  },
+  {
+    "id": "sp-15",
+    "dimension": "spring",
+    "difficulty": "intermediate",
+    "title": "Spring Boot 的配置加载优先级（从高到低）？",
+    "options": [
+      {
+        "label": "application.yml > 环境变量 > 命令行参数",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "命令行参数 > 环境变量 > application.yml",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "环境变量 > application.yml > 命令行参数",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "随机的",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "优先级：命令行参数 > 系统环境变量 > application-{profile}.yml > application.yml > 默认值。"
+  },
+  {
+    "id": "sp-16",
+    "dimension": "spring",
+    "difficulty": "basic",
+    "title": "以下哪个注解不能标记在方法上？",
+    "options": [
+      {
+        "label": "@Transactional",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "@Async",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "@Component",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "@Scheduled",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "@Component 标记在类上。@Transactional、@Async、@Scheduled 都可以标记在方法上。"
+  },
+  {
+    "id": "sp-17",
+    "dimension": "spring",
+    "difficulty": "basic",
+    "title": "Spring MVC 的 @RequestBody 和 @RequestParam 区别？",
+    "options": [
+      {
+        "label": "没有区别",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "@RequestBody 从请求体解析 JSON，@RequestParam 从查询参数解析",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "@RequestParam 更安全",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "@RequestBody 只能用于 GET",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "@RequestBody 将请求体反序列化为对象。@RequestParam 从 URL 查询参数获取值。"
+  },
+  {
+    "id": "sp-18",
+    "dimension": "spring",
+    "difficulty": "intermediate",
+    "title": "Spring Cloud 的服务降级和熔断有什么区别？",
+    "options": [
+      {
+        "label": "完全一样",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "熔断是自动触发的保护机制，降级是兜底的备选方案",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "降级自动触发，熔断手动触发",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "熔断比降级更轻量",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "熔断：下游错误率超阈值时自动打开，快速失败。降级：熔断后的兜底逻辑。"
+  },
+  {
+    "id": "sp-19",
+    "dimension": "spring",
+    "difficulty": "intermediate",
+    "title": "Spring Boot Actuator 的 /health 端点默认需要认证吗？",
+    "options": [
+      {
+        "label": "需要",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "默认不需要，但可以配置",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "取决于 Spring Security 是否引入",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "只有生产环境需要",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "默认 /health 和 /info 不需要认证，其他端点需要。"
+  },
+  {
+    "id": "sp-20",
+    "dimension": "spring",
+    "difficulty": "intermediate",
+    "title": "以下哪种方式不能让 Spring Boot 自动配置失效？",
+    "options": [
+      {
+        "label": "在 application.yml 中设置属性",
+        "value": "a",
+        "score": 4
+      },
+      {
+        "label": "@SpringBootApplication(exclude = {...})",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "@ConditionalOnMissingBean",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "spring.autoconfigure.exclude 配置",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "a",
+    "explanation": "设置属性是修改配置，不是排除自动配置类。排除用 exclude 属性或配置。"
+  }
+]

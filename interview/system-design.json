@@ -1,0 +1,182 @@
+[
+  {
+    "id": "ij-sd-01",
+    "category": "systemDesign",
+    "difficulty": "senior",
+    "question": "如何设计一个秒杀系统？",
+    "answer": "1. 前端：\n   - 按钮防重（点击后置灰）\n   - 验证码/答题（分散请求）\n   - CDN 静态化（减少后端压力）\n   - 前端限流（本地计数）\n\n2. 网关层：\n   - 限流（令牌桶）\n   - 风控（IP 黑名单、设备指纹）\n   - 请求过滤（非法参数）\n\n3. 服务层：\n   - Redis 预减库存（DECR 原子操作）\n   - 库存 ≤ 0 直接返回（内存标记）\n   - 库存扣减成功后发 MQ 消息\n\n4. 消费者：\n   - 异步创建订单\n   - 扣减数据库库存\n   - 支付超时自动回滚库存\n\n5. 兜底：\n   - 熔断降级\n   - 限流拒绝\n   - 超时未支付自动取消\n\n关键：\n- 尽量把请求拦截在上游\n- Redis 预扣库存（原子操作）\n- 异步下单（MQ 削峰）\n- 最终一致性（不是强一致）",
+    "keyPoints": [
+      "前端限流 + 验证码",
+      "网关限流 + 风控",
+      "Redis DECR 预扣库存",
+      "MQ 异步下单削峰"
+    ],
+    "followUp": [
+      "怎么防止超卖？",
+      "库存回滚怎么实现？",
+      "怎么保证最终一致性？"
+    ]
+  },
+  {
+    "id": "ij-sd-02",
+    "category": "systemDesign",
+    "difficulty": "senior",
+    "question": "如何设计一个短链接系统？",
+    "answer": "1. 生成短链：\n   - 自增 ID + Base62 编码（62 进制：a-z, A-Z, 0-9）\n   - 哈希算法（MD5/SHA256）取前 6-8 位\n   - 防冲突：冲突时追加字符\n\n2. 存储：\n   - MySQL：短链 → 长链映射\n   - Redis 缓存热点短链\n\n3. 跳转：\n   - 用户访问短链 → 302 重定向到长链\n   - 先查 Redis，再查 DB\n   - 布隆过滤器拦截不存在的短链\n\n4. 统计：\n   - PV：Redis INCR\n   - UV：HyperLogLog\n   - 详细日志：异步写入 Kafka → ES\n\n5. 过期：\n   - 定时任务清理过期短链\n   - 或惰性删除（访问时检查）\n\n6. 高可用：\n   - 读写分离\n   - 缓存 + 限流\n   - 多机房部署",
+    "keyPoints": [
+      "自增 ID + Base62 编码",
+      "MySQL 存储 + Redis 缓存",
+      "302 重定向",
+      "PV 用 INCR，UV 用 HyperLogLog"
+    ],
+    "followUp": [
+      "Base62 和 Base64 的区别？",
+      "301 和 302 重定向的区别？",
+      "怎么处理哈希冲突？"
+    ]
+  },
+  {
+    "id": "ij-sd-03",
+    "category": "systemDesign",
+    "difficulty": "senior",
+    "question": "如何设计一个消息推送系统？",
+    "answer": "1. 架构：\n   - 推送服务（接收推送请求）\n   - 消息队列（削峰、解耦）\n   - 推送网关（长连接管理）\n   - 客户端 SDK\n\n2. 长连接：\n   - WebSocket（全双工）\n   - Netty 管理百万连接\n   - 心跳检测（30s 一次）\n   - 断线重连\n\n3. 推送方式：\n   - 单推：推送给指定用户\n   - 群推：推送给所有用户\n   - 标签推：推送给特定标签的用户\n\n4. 可靠性：\n   - 消息持久化（数据库）\n   - 重试机制（指数退避）\n   - 离线消息（用户上线后拉取）\n   - ACK 确认\n\n5. 性能：\n   - 连接数：单机 10 万+（Netty）\n   - 消息吞吐：MQ 削峰\n   - 推送延迟：< 1s\n\n6. 监控：\n   - 推送成功率\n   - 推送延迟\n   - 在线连接数",
+    "keyPoints": [
+      "WebSocket 长连接 + Netty",
+      "MQ 削峰解耦",
+      "心跳检测 + 断线重连",
+      "离线消息 + ACK 确保可靠"
+    ],
+    "followUp": [
+      "Netty 怎么管理百万连接？",
+      "WebSocket 和 SSE 的区别？",
+      "什么是心跳检测？"
+    ]
+  },
+  {
+    "id": "ij-sd-04",
+    "category": "systemDesign",
+    "difficulty": "mid",
+    "question": "如何设计一个权限系统（RBAC）？",
+    "answer": "RBAC（Role-Based Access Control）：基于角色的访问控制。\n\n核心模型：\n- 用户（User）：系统的使用者\n- 角色（Role）：权限的集合\n- 权限（Permission）：操作的许可\n- 用户 → 角色 → 权限\n\n数据库设计：\n- user 表\n- role 表\n- permission 表\n- user_role 关联表\n- role_permission 关联表\n\n实现方式：\n1. URL 权限：拦截器检查 URL 访问权限\n2. 方法权限：AOP + 注解（@PreAuthorize）\n3. 数据权限：SQL 拼接（如只能看自己部门的数据）\n\n框架：\n- Spring Security：功能强大，配置复杂\n- Shiro：轻量级，简单易用\n- Sa-Token：国内开源，简单好用\n\n扩展：\n- ABAC（基于属性）：更灵活\n- ACL（访问控制列表）：资源级别权限",
+    "keyPoints": [
+      "用户 → 角色 → 权限",
+      "五张表：user、role、permission + 两张关联表",
+      "URL 权限 + 方法权限 + 数据权限",
+      "Spring Security / Shiro / Sa-Token"
+    ],
+    "followUp": [
+      "什么是数据权限？",
+      "Spring Security 的过滤器链？",
+      "JWT + Spring Security 怎么整合？"
+    ]
+  },
+  {
+    "id": "ij-sd-05",
+    "category": "systemDesign",
+    "difficulty": "mid",
+    "question": "如何设计一个文件上传系统？",
+    "answer": "1. 小文件（< 10MB）：\n   - 直接上传到服务器\n   - 服务器存储到本地磁盘或 OSS\n   - 数据库记录文件信息\n\n2. 大文件（> 10MB）：\n   - 前端分片（每片 5MB）\n   - 并发上传分片\n   - 服务端合并分片\n   - 断点续传（记录已上传分片）\n   - 秒传（MD5 校验，已存在则直接返回）\n\n3. 存储方案：\n   - 本地磁盘：简单，不好扩展\n   - 分布式文件系统：FastDFS、MinIO\n   - 云存储：阿里 OSS、AWS S3\n\n4. CDN 加速：\n   - 静态文件走 CDN\n   - 减少源站压力\n\n5. 安全：\n   - 文件类型校验（白名单）\n   - 文件大小限制\n   - 病毒扫描\n   - 访问权限控制\n\n6. 数据库设计：\n   - file 表：id、name、path、size、md5、status、create_time",
+    "keyPoints": [
+      "小文件直接上传，大文件分片上传",
+      "断点续传 + 秒传（MD5 校验）",
+      "FastDFS / MinIO / 云 OSS",
+      "CDN 加速 + 安全校验"
+    ],
+    "followUp": [
+      "分片上传的流程？",
+      "怎么实现秒传？",
+      "FastDFS 和 MinIO 的区别？"
+    ]
+  },
+  {
+    "id": "ij-sd-06",
+    "category": "systemDesign",
+    "difficulty": "mid",
+    "question": "如何设计一个高可用架构？",
+    "answer": "1. 冗余：\n   - 服务多实例部署\n   - 数据库主从复制\n   - Redis 集群\n   - 多机房部署\n\n2. 故障转移：\n   - 服务注册发现（Nacos）\n   - 健康检查\n   - 自动摘除不健康节点\n   - 客户端负载均衡\n\n3. 限流降级：\n   - 网关限流\n   - 服务熔断（Sentinel）\n   - 降级返回默认值\n\n4. 监控告警：\n   - 指标监控（Prometheus + Grafana）\n   - 日志收集（ELK）\n   - 链路追踪（SkyWalking）\n   - 告警通知（钉钉、邮件）\n\n5. 灰度发布：\n   - 蓝绿部署\n   - 金丝雀发布\n   - A/B 测试\n\n6. 容灾：\n   - 同城双活\n   - 异地多活\n\n可用性目标：\n- 99.9%（三个 9）：年停机 8.76 小时\n- 99.99%（四个 9）：年停机 52.6 分钟\n- 99.999%（五个 9）：年停机 5.26 分钟",
+    "keyPoints": [
+      "冗余 + 故障转移 + 限流降级",
+      "监控告警 + 灰度发布",
+      "同城双活 + 异地多活",
+      "四个 9 = 年停机 52.6 分钟"
+    ],
+    "followUp": [
+      "蓝绿部署和金丝雀发布的区别？",
+      "怎么做异地多活？",
+      "什么是 Chaos Engineering？"
+    ]
+  },
+  {
+    "id": "ij-sd-07",
+    "category": "systemDesign",
+    "difficulty": "mid",
+    "question": "如何设计一个高并发系统？",
+    "answer": "1. 缓存：\n   - 本地缓存（Caffeine）\n   - 分布式缓存（Redis）\n   - 多级缓存\n   - 缓存预热\n\n2. 异步：\n   - 消息队列（Kafka、RocketMQ）\n   - 异步线程池\n   - CompletableFuture\n\n3. 限流：\n   - 网关限流\n   - 服务限流\n   - 数据库限流\n\n4. 数据库优化：\n   - 读写分离\n   - 分库分表\n   - 索引优化\n   - SQL 优化\n\n5. 服务拆分：\n   - 微服务化\n   - 服务独立部署\n   - 按需扩容\n\n6. 前端优化：\n   - CDN\n   - 静态资源缓存\n   - 防重复提交\n\n核心思想：\n- 尽量让请求在上游处理（缓存、限流）\n- 减少数据库压力（缓存、异步）\n- 水平扩展（无状态、负载均衡）",
+    "keyPoints": [
+      "缓存 + 异步 + 限流",
+      "读写分离 + 分库分表",
+      "微服务 + 水平扩展",
+      "请求尽量在上游处理"
+    ],
+    "followUp": [
+      "什么是缓存预热？",
+      "怎么实现无状态服务？",
+      "什么是热点问题？"
+    ]
+  },
+  {
+    "id": "ij-sd-08",
+    "category": "systemDesign",
+    "difficulty": "mid",
+    "question": "什么是 DDD？怎么落地？",
+    "answer": "DDD（Domain-Driven Design）：领域驱动设计，以业务领域为核心的设计方法。\n\n核心概念：\n1. 领域：业务问题域\n2. 实体（Entity）：有唯一标识的对象\n3. 值对象（Value Object）：没有唯一标识，不可变\n4. 聚合（Aggregate）：一组相关对象的集合\n5. 聚合根（Aggregate Root）：聚合的入口\n6. 限界上下文（Bounded Context）：领域的边界\n7. 领域事件（Domain Event）：领域中发生的事件\n8. 领域服务（Domain Service）：不属于实体的业务逻辑\n\n分层架构：\n- 用户接口层（Controller）\n- 应用层（Application Service）\n- 领域层（Domain Model）\n- 基础设施层（Repository、DAO）\n\n落地步骤：\n1. 事件风暴（Event Storming）识别领域事件\n2. 划分限界上下文\n3. 设计聚合和实体\n4. 实现领域模型\n5. 持续重构\n\n适用场景：复杂业务系统。简单 CRUD 不需要 DDD。",
+    "keyPoints": [
+      "以业务领域为核心",
+      "实体、值对象、聚合根、限界上下文",
+      "四层架构：接口层、应用层、领域层、基础设施层",
+      "事件风暴识别领域"
+    ],
+    "followUp": [
+      "实体和值对象的区别？",
+      "什么是事件风暴？",
+      "贫血模型和充血模型的区别？"
+    ]
+  },
+  {
+    "id": "ij-sd-09",
+    "category": "systemDesign",
+    "difficulty": "mid",
+    "question": "如何设计一个配置中心？",
+    "answer": "1. 功能需求：\n   - 配置管理（增删改查）\n   - 配置推送（实时生效）\n   - 版本管理（回滚）\n   - 权限控制\n   - 灰度发布\n\n2. 存储：\n   - MySQL 存储配置\n   - Redis 缓存\n   - 本地缓存（防网络抖动）\n\n3. 推送方式：\n   - 长轮询（客户端定时拉取）\n   - WebSocket（服务端主动推送）\n   - 长轮询更简单可靠\n\n4. 高可用：\n   - 配置中心集群\n   - 客户端本地缓存（配置中心不可用时使用本地）\n   - 多机房部署\n\n5. 实现方案：\n   - Nacos Config（阿里，推荐）\n   - Apollo（携程）\n   - Spring Cloud Config\n\nNacos Config 特点：\n- 长轮询推送（默认 30s）\n- 多环境（dev/test/prod）\n- 多格式（properties/yaml/json）\n- 灰度发布",
+    "keyPoints": [
+      "MySQL 存储 + Redis 缓存 + 本地缓存",
+      "长轮询推送（简单可靠）",
+      "Nacos Config 推荐",
+      "客户端本地缓存保底"
+    ],
+    "followUp": [
+      "Nacos 和 Apollo 的区别？",
+      "长轮询的原理？",
+      "怎么实现配置灰度发布？"
+    ]
+  },
+  {
+    "id": "ij-sd-10",
+    "category": "systemDesign",
+    "difficulty": "mid",
+    "question": "如何设计一个日志系统？",
+    "answer": "1. 日志采集：\n   - 应用日志（Logback/Log4j2）\n   - 文件日志（Filebeat）\n   - 标准输出（Docker 日志）\n\n2. 传输：\n   - Kafka（高吞吐）\n   - 直接发送到 ES\n\n3. 存储：\n   - Elasticsearch（全文检索）\n   - 冷数据归档（HDFS/OSS）\n\n4. 展示：\n   - Kibana（查询、可视化）\n   - Grafana（指标面板）\n\n5. 架构（ELK）：\n   - Logstash/Filebeat（采集）→ Kafka → Logstash（处理）→ Elasticsearch → Kibana\n\n6. 规范：\n   - 统一日志格式（JSON）\n   - 包含 TraceId\n   - 日志级别规范（ERROR/WARN/INFO/DEBUG）\n   - 敏感信息脱敏\n\n7. 监控告警：\n   - ERROR 日志告警\n   - 日志量异常告警\n   - 慢查询日志告警\n\n优化：\n- 异步日志（AsyncAppender）\n- 日志采样（高并发时）\n- 日志级别动态调整",
+    "keyPoints": [
+      "ELK：Filebeat → Kafka → Logstash → ES → Kibana",
+      "JSON 格式 + TraceId",
+      "异步日志减少性能影响",
+      "ERROR 日志告警"
+    ],
+    "followUp": [
+      "什么是 ELK？",
+      "日志怎么脱敏？",
+      "怎么动态调整日志级别？"
+    ]
+  }
+]

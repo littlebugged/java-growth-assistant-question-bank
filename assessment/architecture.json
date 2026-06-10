@@ -1,0 +1,602 @@
+[
+  {
+    "id": "ar-01",
+    "dimension": "architecture",
+    "difficulty": "basic",
+    "title": "以下代码违反了哪个设计原则？\n\npublic class OrderService {\n    public void createOrder() { ... }\n    public void cancelOrder() { ... }\n    public void sendEmail() { ... }\n    public void generateReport() { ... }\n}",
+    "options": [
+      {
+        "label": "开闭原则",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "单一职责原则",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "里氏替换原则",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "依赖倒置原则",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "OrderService 做了太多事情：订单管理、发邮件、生成报告。应该拆分。"
+  },
+  {
+    "id": "ar-02",
+    "dimension": "architecture",
+    "difficulty": "intermediate",
+    "title": "微服务中，API Gateway 的作用不包括？",
+    "options": [
+      {
+        "label": "路由转发",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "限流熔断",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "业务逻辑处理",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "认证鉴权",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "API Gateway 负责路由、限流、认证等横切关注点。业务逻辑应该在后端微服务中。"
+  },
+  {
+    "id": "ar-03",
+    "dimension": "architecture",
+    "difficulty": "intermediate",
+    "title": "分布式系统中，幂等性是什么意思？",
+    "options": [
+      {
+        "label": "操作只能执行一次",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "同一个操作执行多次和执行一次效果相同",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "操作不可逆",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "操作是原子的",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "幂等性：f(f(x)) = f(x)。如 HTTP PUT 是幂等的，POST 不是。"
+  },
+  {
+    "id": "ar-04",
+    "dimension": "architecture",
+    "difficulty": "basic",
+    "title": "以下哪种不是负载均衡算法？",
+    "options": [
+      {
+        "label": "轮询",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "加权轮询",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "一致性哈希",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "二阶段提交",
+        "value": "d",
+        "score": 4
+      }
+    ],
+    "answer": "d",
+    "explanation": "二阶段提交（2PC）是分布式事务协议，不是负载均衡算法。"
+  },
+  {
+    "id": "ar-05",
+    "dimension": "architecture",
+    "difficulty": "advanced",
+    "title": "DDD 中聚合根和实体的区别？",
+    "options": [
+      {
+        "label": "没有区别",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "聚合根有全局唯一标识，是聚合的入口；实体有局部标识",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "聚合根是数据库主表",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "实体不能有方法",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "聚合根是特殊实体，是聚合的入口和一致性边界。外部只能通过聚合根访问聚合内的实体。"
+  },
+  {
+    "id": "ar-06",
+    "dimension": "architecture",
+    "difficulty": "intermediate",
+    "title": "如何保证消息队列的消费顺序？",
+    "options": [
+      {
+        "label": "无法保证",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "同一 key 的消息发到同一个分区，单线程消费",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "用事务消息",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "增加消费者数量",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "Kafka：同一 key 通过 hash 到同一分区，分区内有序，单线程消费保证顺序。"
+  },
+  {
+    "id": "ar-07",
+    "dimension": "architecture",
+    "difficulty": "basic",
+    "title": "以下哪种不是常见的限流算法？",
+    "options": [
+      {
+        "label": "令牌桶",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "漏桶",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "滑动窗口",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "布隆过滤器",
+        "value": "d",
+        "score": 4
+      }
+    ],
+    "answer": "d",
+    "explanation": "布隆过滤器用于判断元素是否存在，不是限流算法。"
+  },
+  {
+    "id": "ar-08",
+    "dimension": "architecture",
+    "difficulty": "advanced",
+    "title": "Event Sourcing 的核心思想？",
+    "options": [
+      {
+        "label": "存储当前状态",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "不存储状态，只存储状态变更的事件序列",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "用事件触发通知",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "事件驱动的消息队列",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "Event Sourcing：不存储当前状态，只存储所有状态变更事件。通过重放事件重建状态。"
+  },
+  {
+    "id": "ar-09",
+    "dimension": "architecture",
+    "difficulty": "advanced",
+    "title": "雪花算法的 64 位怎么分配？",
+    "options": [
+      {
+        "label": "32 位时间戳 + 32 位随机数",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "1 位符号 + 41 位时间戳 + 10 位机器 ID + 12 位序列号",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "64 位随机数",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "48 位时间戳 + 16 位机器 ID",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "1 位不用 + 41 位毫秒时间戳（约 69 年）+ 10 位机器 ID + 12 位序列号。"
+  },
+  {
+    "id": "ar-10",
+    "dimension": "architecture",
+    "difficulty": "intermediate",
+    "title": "如何设计一个高可用系统？以下哪个不是关键手段？",
+    "options": [
+      {
+        "label": "冗余部署",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "故障转移",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "使用最新技术栈",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "限流降级",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "高可用关键：冗余、故障转移、限流降级、监控告警。技术栈新不新和高可用无关。"
+  },
+  {
+    "id": "ar-11",
+    "dimension": "architecture",
+    "difficulty": "basic",
+    "title": "以下哪个不是 SOLID 原则？",
+    "options": [
+      {
+        "label": "单一职责",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "开闭原则",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "迪米特法则",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "里氏替换",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "SOLID：S 单一职责、O 开闭原则、L 里氏替换、I 接口隔离、D 依赖倒置。迪米特法则不属于 SOLID。"
+  },
+  {
+    "id": "ar-12",
+    "dimension": "architecture",
+    "difficulty": "intermediate",
+    "title": "微服务中「熔断」的作用是？",
+    "options": [
+      {
+        "label": "断开网络连接",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "当下游服务故障时快速失败，防止级联故障",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "重启服务",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "记录日志",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "熔断器模式：下游错误率超阈值时自动打开，快速失败，不再调用下游。"
+  },
+  {
+    "id": "ar-13",
+    "dimension": "architecture",
+    "difficulty": "intermediate",
+    "title": "BASE 理论中的 E 是指？",
+    "options": [
+      {
+        "label": "Eventual（最终一致性）",
+        "value": "a",
+        "score": 4
+      },
+      {
+        "label": "Exactly-once（精确一次）",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "Efficiency（效率）",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "Encryption（加密）",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "a",
+    "explanation": "BASE：Basically Available、Soft state、Eventually consistent。"
+  },
+  {
+    "id": "ar-14",
+    "dimension": "architecture",
+    "difficulty": "advanced",
+    "title": "DDD 中的「限界上下文」是指？",
+    "options": [
+      {
+        "label": "数据库的边界",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "一个业务领域的边界，内部有统一的语言和模型",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "微服务的边界",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "API 的边界",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "限界上下文是 DDD 的核心概念：一个业务领域的边界，内部有统一的领域语言和模型。"
+  },
+  {
+    "id": "ar-15",
+    "dimension": "architecture",
+    "difficulty": "intermediate",
+    "title": "2PC（两阶段提交）的主要缺点？",
+    "options": [
+      {
+        "label": "实现复杂",
+        "value": "a",
+        "score": 2
+      },
+      {
+        "label": "同步阻塞、单点故障、数据不一致风险",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "性能好但不安全",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "只支持两个参与者",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "2PC 缺点：同步阻塞、协调者单点故障、网络分区可能导致数据不一致。"
+  },
+  {
+    "id": "ar-16",
+    "dimension": "architecture",
+    "difficulty": "intermediate",
+    "title": "令牌桶和漏桶的核心区别？",
+    "options": [
+      {
+        "label": "没有区别",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "令牌桶允许突发流量，漏桶输出速率恒定",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "漏桶更快",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "令牌桶不能限流",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "漏桶恒定速率输出，完全削峰。令牌桶允许一定程度的突发流量。"
+  },
+  {
+    "id": "ar-17",
+    "dimension": "architecture",
+    "difficulty": "advanced",
+    "title": "Service Mesh 中的 Sidecar 是什么？",
+    "options": [
+      {
+        "label": "数据库代理",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "部署在每个服务旁边的代理，拦截所有网络流量",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "负载均衡器",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "日志收集器",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "Sidecar（如 Envoy）部署在每个服务实例旁边，拦截所有流量，实现服务治理。"
+  },
+  {
+    "id": "ar-18",
+    "dimension": "architecture",
+    "difficulty": "advanced",
+    "title": "CQRS 模式中，Command 和 Query 可以用不同的数据库吗？",
+    "options": [
+      {
+        "label": "不可以",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "可以，写端用关系库，读端可以用文档库或搜索引擎",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "只有 NoSQL 可以",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "需要分布式事务保证",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "b",
+    "explanation": "CQRS 允许读写使用不同的数据模型甚至不同的数据库，通过事件同步。"
+  },
+  {
+    "id": "ar-19",
+    "dimension": "architecture",
+    "difficulty": "advanced",
+    "title": "秒杀系统中，Redis 预扣库存用什么命令？",
+    "options": [
+      {
+        "label": "SET + GET",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "DECR 原子递减，判断返回值是否 ≥ 0",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "用分布式锁",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "用事务",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "DECR 是原子操作，返回递减后的值。≥ 0 表示扣减成功，< 0 表示库存不足。"
+  },
+  {
+    "id": "ar-20",
+    "dimension": "architecture",
+    "difficulty": "intermediate",
+    "title": "技术债务最好的处理方式是？",
+    "options": [
+      {
+        "label": "推倒重写",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "持续识别，每个迭代分配固定比例时间偿还",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "不管它",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "等项目结束后再处理",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "推倒重写风险极高。正确做法：持续识别 → 量化 → 排优先级 → 每迭代分配 15-20% 时间重构。"
+  }
+]

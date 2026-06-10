@@ -1,0 +1,146 @@
+[
+  {
+    "id": "ij-do-01",
+    "category": "devops",
+    "difficulty": "mid",
+    "question": "Docker 的核心概念？和虚拟机的区别？",
+    "answer": "核心概念：\n1. 镜像（Image）：只读模板，包含运行环境和代码\n2. 容器（Container）：镜像的运行实例\n3. Dockerfile：构建镜像的脚本\n4. 仓库（Registry）：存储镜像（Docker Hub、Harbor）\n\nDocker vs 虚拟机：\n- Docker：容器级虚拟化，共享宿主机内核，启动秒级\n- 虚拟机：系统级虚拟化，独立内核，启动分钟级\n- Docker 更轻量（MB 级），虚拟机更重（GB 级）\n- Docker 隔离性弱（共享内核），虚拟机隔离性强\n\n常用命令：\n- docker build -t name .：构建镜像\n- docker run -d -p 8080:80 name：运行容器\n- docker ps：查看容器\n- docker logs：查看日志\n- docker exec -it container bash：进入容器\n\nDockerfile：\n- FROM：基础镜像\n- COPY：复制文件\n- RUN：执行命令\n- EXPOSE：声明端口\n- CMD：启动命令",
+    "keyPoints": [
+      "镜像只读模板，容器运行实例",
+      "Docker 共享内核，虚拟机独立内核",
+      "Docker 秒级启动，虚拟机分钟级",
+      "Dockerfile 构建镜像"
+    ],
+    "followUp": [
+      "什么是多阶段构建？",
+      "Docker 的网络模式？",
+      "什么是 Docker Compose？"
+    ]
+  },
+  {
+    "id": "ij-do-02",
+    "category": "devops",
+    "difficulty": "mid",
+    "question": "Kubernetes（K8s）的核心概念？",
+    "answer": "核心概念：\n1. Pod：最小部署单元，一个或多个容器\n2. Deployment：管理 Pod 的副本数、滚动更新\n3. Service：提供稳定的网络访问（负载均衡）\n4. Namespace：资源隔离\n5. ConfigMap/Secret：配置管理\n6. Ingress：外部访问入口（域名路由）\n7. PV/PVC：持久化存储\n8. HPA：自动扩缩容\n\n架构：\n- Master：API Server、Scheduler、Controller Manager、etcd\n- Node：kubelet、kube-proxy、容器运行时\n\n常用命令：\n- kubectl get pods：查看 Pod\n- kubectl apply -f yaml：部署\n- kubectl logs pod：查看日志\n- kubectl exec -it pod bash：进入 Pod\n\n部署流程：\n1. 编写 Dockerfile 构建镜像\n2. 编写 Deployment YAML\n3. 编写 Service YAML\n4. kubectl apply 部署",
+    "keyPoints": [
+      "Pod 最小部署单元",
+      "Deployment 管理副本和更新",
+      "Service 提供稳定访问",
+      "HPA 自动扩缩容"
+    ],
+    "followUp": [
+      "Pod 和容器的区别？",
+      "Service 的类型？",
+      "什么是滚动更新？"
+    ]
+  },
+  {
+    "id": "ij-do-03",
+    "category": "devops",
+    "difficulty": "mid",
+    "question": "什么是 CI/CD？怎么搭建？",
+    "answer": "CI（持续集成）：代码提交后自动构建、测试。\nCD（持续交付/部署）：构建通过后自动部署到环境。\n\n流程：\n代码提交 → 触发构建 → 单元测试 → 代码检查 → 构建镜像 → 推送仓库 → 部署\n\n工具：\n- Jenkins：最流行，插件丰富\n- GitLab CI：GitLab 内置\n- GitHub Actions：GitHub 内置\n- ArgoCD：GitOps，K8s 原生\n\nGitLab CI 示例（.gitlab-ci.yml）：\nstages:\n  - test\n  - build\n  - deploy\n\ntest:\n  stage: test\n  script:\n    - mvn test\n\nbuild:\n  stage: build\n  script:\n    - docker build -t app:$CI_COMMIT_SHA .\n    - docker push registry/app:$CI_COMMIT_SHA\n\ndeploy:\n  stage: deploy\n  script:\n    - kubectl set image deployment/app app=registry/app:$CI_COMMIT_SHA\n\n关键：\n- 自动化测试覆盖率\n- 构建速度优化（缓存）\n- 环境一致性\n- 回滚机制",
+    "keyPoints": [
+      "CI 代码提交自动构建测试",
+      "CD 构建通过自动部署",
+      "Jenkins / GitLab CI / GitHub Actions",
+      "自动测试 + 构建镜像 + 部署"
+    ],
+    "followUp": [
+      "什么是 GitOps？",
+      "Jenkins Pipeline 怎么写？",
+      "怎么实现蓝绿部署？"
+    ]
+  },
+  {
+    "id": "ij-do-04",
+    "category": "devops",
+    "difficulty": "mid",
+    "question": "Linux 常用命令？",
+    "answer": "文件操作：\n- ls -la：列出文件\n- cd：切换目录\n- cp/mv/rm：复制/移动/删除\n- mkdir -p：创建目录\n- cat/less/tail：查看文件\n- find：查找文件\n- grep：搜索内容\n\n进程管理：\n- ps aux：查看进程\n- top：实时监控\n- kill -9 PID：强制杀进程\n- nohup command &：后台运行\n\n网络：\n- netstat -tlnp：查看端口\n- curl：HTTP 请求\n- wget：下载文件\n- ping：网络连通\n- telnet host port：端口连通\n\n系统：\n- df -h：磁盘使用\n- free -h：内存使用\n- uname -a：系统信息\n- lsof -i :8080：查看端口占用\n\n日志：\n- tail -f file：实时查看\n- grep \"error\" file：搜索错误\n- awk：文本处理\n- sed：文本替换\n\n压缩：\n- tar -czf：压缩\n- tar -xzf：解压",
+    "keyPoints": [
+      "ps/top/kill 进程管理",
+      "netstat/lsof 端口查看",
+      "tail -f 实时查看日志",
+      "grep 搜索内容"
+    ],
+    "followUp": [
+      "怎么查看 Java 进程？",
+      "怎么查看端口占用？",
+      "什么是软链接和硬链接？"
+    ]
+  },
+  {
+    "id": "ij-do-05",
+    "category": "devops",
+    "difficulty": "mid",
+    "question": "什么是 Nginx？常见配置？",
+    "answer": "Nginx：高性能 HTTP 服务器和反向代理服务器。\n\n核心功能：\n1. 反向代理：代理后端服务器\n2. 负载均衡：分发请求到多个后端\n3. 静态资源：提供静态文件服务\n4. HTTPS：SSL 终端\n\n负载均衡策略：\n- 轮询（默认）\n- 加权轮询\n- IP Hash（会话保持）\n- 最少连接\n\n常见配置：\n```nginx\nupstream backend {\n    server 192.168.1.1:8080 weight=3;\n    server 192.168.1.2:8080;\n}\n\nserver {\n    listen 80;\n    server_name example.com;\n\n    location / {\n        proxy_pass http://backend;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n    }\n\n    location /static/ {\n        root /data;\n        expires 30d;\n    }\n}\n```\n\n性能：\n- 事件驱动（epoll）\n- 单机支持 10 万+并发\n- 内存占用少（2-3MB）",
+    "keyPoints": [
+      "反向代理 + 负载均衡 + 静态资源",
+      "轮询、加权轮询、IP Hash",
+      "proxy_pass 转发请求",
+      "事件驱动，单机 10 万+并发"
+    ],
+    "followUp": [
+      "正向代理和反向代理的区别？",
+      "Nginx 和 Gateway 的区别？",
+      "Nginx 的优化配置？"
+    ]
+  },
+  {
+    "id": "ij-do-06",
+    "category": "devops",
+    "difficulty": "mid",
+    "question": "什么是 Prometheus + Grafana？",
+    "answer": "Prometheus：开源监控和告警系统。\n\n核心组件：\n- Prometheus Server：采集和存储指标\n- Exporter：暴露指标（如 Node Exporter、JMX Exporter）\n- Alertmanager：告警通知\n- PushGateway：短期任务推送指标\n\n工作流程：\n1. Exporter 暴露 /metrics 端点\n2. Prometheus 定时拉取（Pull 模式）\n3. 存储到时序数据库（TSDB）\n4. PromQL 查询\n5. 告警规则触发 → Alertmanager → 通知\n\nGrafana：\n- 可视化面板\n- 支持多种数据源（Prometheus、ES、MySQL）\n- 丰富的图表类型\n- 告警规则\n\nJava 应用监控：\n- Spring Boot Actuator + Micrometer\n- 暴露 /actuator/prometheus 端点\n- Prometheus 拉取\n- Grafana 展示\n\n监控指标：\n- 系统：CPU、内存、磁盘、网络\n- JVM：堆内存、GC、线程数\n- 应用：QPS、RT、错误率",
+    "keyPoints": [
+      "Prometheus Pull 模式拉取指标",
+      "Grafana 可视化面板",
+      "Alertmanager 告警通知",
+      "Spring Boot + Micrometer 暴露指标"
+    ],
+    "followUp": [
+      "Pull 和 Push 模式的区别？",
+      "什么是 PromQL？",
+      "怎么设置告警规则？"
+    ]
+  },
+  {
+    "id": "ij-do-07",
+    "category": "devops",
+    "difficulty": "mid",
+    "question": "什么是 Git 工作流？常见分支策略？",
+    "answer": "Git Flow：\n- master：生产环境\n- develop：开发分支\n- feature/*：功能分支\n- release/*：发布分支\n- hotfix/*：热修复分支\n\nGitHub Flow：\n- main：主分支\n- feature 分支：从 main 拉取，完成后 PR 合并\n- 简单，适合持续部署\n\nTrunk Based Development：\n- 所有人直接提交到主分支\n- 短生命周期的 feature 分支（< 1 天）\n- 适合 CI/CD\n\n分支策略：\n1. 从 main 拉取 feature 分支\n2. 开发完成后提 PR\n3. Code Review\n4. CI 自动测试\n5. 合并到 main\n6. 自动部署\n\n规范：\n- Commit Message 规范（Conventional Commits）\n- PR 模板\n- Code Review 至少一人通过\n- CI 通过才能合并",
+    "keyPoints": [
+      "Git Flow：master + develop + feature + release + hotfix",
+      "GitHub Flow：main + feature 分支",
+      "Trunk Based：直接提交主分支",
+      "PR + Code Review + CI"
+    ],
+    "followUp": [
+      "什么是 Rebase 和 Merge 的区别？",
+      "什么是 Conventional Commits？",
+      "怎么解决 Git 冲突？"
+    ]
+  },
+  {
+    "id": "ij-do-08",
+    "category": "devops",
+    "difficulty": "mid",
+    "question": "什么是微服务架构的可观测性？",
+    "answer": "可观测性（Observability）三大支柱：\n\n1. 指标（Metrics）：\n   - 系统指标：CPU、内存、磁盘\n   - 应用指标：QPS、RT、错误率\n   - 业务指标：订单量、转化率\n   - 工具：Prometheus + Grafana\n\n2. 日志（Logging）：\n   - 应用日志：Logback/Log4j2\n   - 访问日志：Nginx\n   - 错误日志：异常堆栈\n   - 工具：ELK（Elasticsearch + Logstash + Kibana）\n\n3. 链路追踪（Tracing）：\n   - 请求链路：TraceId\n   - 调用耗时：Span\n   - 依赖关系：服务拓扑\n   - 工具：SkyWalking、Jaeger、Zipkin\n\n整合：\n- 日志中打印 TraceId\n- 指标中标记 TraceId\n- 三者关联分析\n\n告警：\n- 指标告警（Prometheus Alertmanager）\n- 日志告警（ELK Watcher）\n- 链路告警（SkyWalking）",
+    "keyPoints": [
+      "三大支柱：指标、日志、链路追踪",
+      "Prometheus + ELK + SkyWalking",
+      "日志中打印 TraceId 关联",
+      "告警通知（钉钉、邮件）"
+    ],
+    "followUp": [
+      "怎么在日志中打印 TraceId？",
+      "什么是 SLO/SLA/SLI？",
+      "什么是 Chaos Engineering？"
+    ]
+  }
+]

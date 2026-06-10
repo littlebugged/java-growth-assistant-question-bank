@@ -1,0 +1,182 @@
+[
+  {
+    "id": "ij-pj-01",
+    "category": "project",
+    "difficulty": "mid",
+    "question": "介绍一个你做过的最有挑战的项目？",
+    "answer": "回答框架（STAR 法则）：\n\nS（Situation）：项目背景\n- 什么业务场景\n- 面临什么问题\n- 为什么需要做\n\nT（Task）：你的任务\n- 你负责什么\n- 目标是什么\n- 有什么约束\n\nA（Action）：你的行动\n- 你做了什么\n- 用了什么技术方案\n- 遇到了什么困难，怎么解决的\n\nR（Result）：结果\n- 项目成果（量化）\n- 你学到了什么\n\n示例：\nS：电商系统大促期间订单量暴增 10 倍，数据库扛不住\nT：负责订单系统的性能优化\nA：引入 Redis 缓存 + 异步下单 + 分库分表\nR：QPS 从 1000 提升到 10000，大促零故障\n\n关键点：\n- 有量化数据\n- 突出你的贡献\n- 体现技术深度\n- 展示解决问题的能力",
+    "keyPoints": [
+      "STAR 法则：Situation、Task、Action、Result",
+      "量化成果（QPS、延迟、可用性）",
+      "突出个人贡献",
+      "体现技术深度和解决问题能力"
+    ],
+    "followUp": [
+      "你在项目中遇到的最大困难？",
+      "如果重新做你会怎么改进？",
+      "项目中你学到了什么？"
+    ]
+  },
+  {
+    "id": "ij-pj-02",
+    "category": "project",
+    "difficulty": "mid",
+    "question": "你们项目的技术选型是怎么做的？",
+    "answer": "技术选型考虑因素：\n\n1. 业务需求：\n   - 功能是否满足\n   - 性能要求\n   - 可扩展性\n\n2. 技术成熟度：\n   - 社区活跃度\n   - 文档完善度\n   - 版本稳定性\n\n3. 团队能力：\n   - 学习成本\n   - 团队熟悉度\n   - 招聘难度\n\n4. 生态：\n   - 与现有技术栈的兼容\n   - 周边工具支持\n   - 长期维护\n\n5. 成本：\n   - 开发成本\n   - 运维成本\n   - 许可证\n\n示例：选择消息队列\n- Kafka：高吞吐，日志场景\n- RocketMQ：事务消息，电商场景\n- RabbitMQ：功能丰富，复杂路由\n- 选择：电商场景选 RocketMQ（事务消息支持）\n\n关键：不要为了用技术而用技术，技术服务于业务。",
+    "keyPoints": [
+      "业务需求驱动",
+      "技术成熟度 + 团队能力",
+      "生态兼容 + 长期维护",
+      "不要为了用技术而用技术"
+    ],
+    "followUp": [
+      "为什么选 Redis 而不是 Memcached？",
+      "为什么选 MySQL 而不是 MongoDB？",
+      "技术债务怎么管理？"
+    ]
+  },
+  {
+    "id": "ij-pj-03",
+    "category": "project",
+    "difficulty": "mid",
+    "question": "项目中遇到过什么线上问题？怎么排查的？",
+    "answer": "回答框架：\n1. 问题现象：什么表现，影响范围\n2. 排查过程：用了什么工具，怎么定位\n3. 根因分析：根本原因是什么\n4. 解决方案：怎么修复\n5. 预防措施：怎么避免再次发生\n\n示例：\n现象：接口响应时间从 100ms 突增到 5s\n排查：\n1. 看监控：CPU、内存、GC\n2. 发现 Full GC 频繁\n3. jmap 导出堆转储\n4. MAT 分析发现大对象（List 不断添加未清理）\n5. 定位到代码：定时任务缓存未清理\n\n根因：定时任务每次查询结果缓存到 List，但未清理旧数据\n解决：\n1. 修复代码，限制 List 大小\n2. 添加监控告警\n3. 定期 Review 代码\n\n关键：\n- 体现排查思路\n- 使用工具能力\n- 根因分析能力\n- 预防措施",
+    "keyPoints": [
+      "现象 → 排查 → 根因 → 解决 → 预防",
+      "使用监控和排查工具",
+      "体现排查思路和工具能力",
+      "预防措施避免再次发生"
+    ],
+    "followUp": [
+      "你用过哪些排查工具？",
+      "怎么监控线上服务？",
+      "什么是灰度发布？"
+    ]
+  },
+  {
+    "id": "ij-pj-04",
+    "category": "project",
+    "difficulty": "mid",
+    "question": "你怎么做代码 Review？关注哪些点？",
+    "answer": "Review 关注点：\n\n1. 正确性：\n   - 逻辑是否正确\n   - 边界条件处理\n   - 异常处理\n\n2. 设计：\n   - 是否符合设计模式\n   - 单一职责\n   - 可扩展性\n\n3. 性能：\n   - 是否有性能问题\n   - 是否有不必要的循环\n   - 数据库查询优化\n\n4. 安全：\n   - SQL 注入\n   - XSS\n   - 权限校验\n\n5. 可读性：\n   - 命名规范\n   - 注释清晰\n   - 代码结构清晰\n\n6. 测试：\n   - 是否有单元测试\n   - 覆盖率\n   - 边界测试\n\nReview 流程：\n1. 先理解需求\n2. 整体架构 Review\n3. 细节代码 Review\n4. 提出建议（不是命令）\n5. 确认修改\n\n态度：\n- 尊重作者\n- 提问而非命令\n- 给出理由\n- 赞美好的代码",
+    "keyPoints": [
+      "正确性、设计、性能、安全、可读性、测试",
+      "先理解需求再 Review",
+      "提问而非命令",
+      "赞美好的代码"
+    ],
+    "followUp": [
+      "你觉得什么样的代码是好代码？",
+      "什么是代码的坏味道？",
+      "怎么推动团队代码规范？"
+    ]
+  },
+  {
+    "id": "ij-pj-05",
+    "category": "project",
+    "difficulty": "mid",
+    "question": "你怎么保证代码质量？",
+    "answer": "代码质量保障：\n\n1. 编码阶段：\n   - 遵循编码规范\n   - 代码自测\n   - 单元测试\n\n2. Review 阶段：\n   - Code Review\n   - 静态分析（SonarQube）\n   - 代码规范检查（Checkstyle）\n\n3. 测试阶段：\n   - 单元测试（JUnit + Mockito）\n   - 集成测试\n   - 接口测试（Postman）\n   - 性能测试（JMeter）\n\n4. 部署阶段：\n   - CI/CD 自动化\n   - 灰度发布\n   - 回滚机制\n\n5. 监控阶段：\n   - 日志监控\n   - 性能监控\n   - 告警机制\n\n单元测试：\n- 覆盖核心逻辑\n- Mock 外部依赖\n- 测试边界条件\n- 测试异常情况\n\n工具：\n- JUnit 5 + Mockito\n- SonarQube（代码质量）\n- JaCoCo（覆盖率）",
+    "keyPoints": [
+      "编码规范 + Code Review + 单元测试",
+      "SonarQube 静态分析",
+      "CI/CD 自动化",
+      "灰度发布 + 回滚机制"
+    ],
+    "followUp": [
+      "单元测试怎么写？",
+      "什么是 TDD？",
+      "SonarQube 检查什么？"
+    ]
+  },
+  {
+    "id": "ij-pj-06",
+    "category": "project",
+    "difficulty": "mid",
+    "question": "你怎么做性能优化？",
+    "answer": "性能优化步骤：\n\n1. 性能测试：\n   - JMeter 压测\n   - 找到瓶颈\n   - 量化指标（QPS、RT、错误率）\n\n2. 代码优化：\n   - 算法优化（O(n²) → O(nlogn)）\n   - 减少循环嵌套\n   - 避免重复计算\n   - 懒加载\n\n3. 数据库优化：\n   - 索引优化\n   - SQL 优化\n   - 读写分离\n   - 分库分表\n\n4. 缓存优化：\n   - 多级缓存\n   - 缓存预热\n   - 缓存穿透/击穿/雪崩\n\n5. 架构优化：\n   - 异步处理（MQ）\n   - 服务拆分\n   - 水平扩容\n\n6. JVM 优化：\n   - 堆大小调整\n   - GC 选择\n   - JIT 优化\n\n关键：先量化，再优化，再验证。",
+    "keyPoints": [
+      "先压测找瓶颈",
+      "代码→数据库→缓存→架构→JVM",
+      "量化指标：QPS、RT、错误率",
+      "先量化，再优化，再验证"
+    ],
+    "followUp": [
+      "你用过哪些性能测试工具？",
+      "什么是全链路压测？",
+      "什么是性能基线？"
+    ]
+  },
+  {
+    "id": "ij-pj-07",
+    "category": "project",
+    "difficulty": "mid",
+    "question": "你怎么设计数据库表？",
+    "answer": "设计步骤：\n\n1. 需求分析：\n   - 业务实体\n   - 实体关系\n   - 数据量预估\n\n2. 概念设计：\n   - ER 图\n   - 实体、属性、关系\n\n3. 逻辑设计：\n   - 表结构\n   - 字段类型\n   - 主键、外键\n   - 索引\n\n4. 物理设计：\n   - 分区\n   - 分表\n   - 存储引擎\n\n设计规范：\n1. 命名规范：小写，下划线分隔\n2. 主键：自增 ID 或雪花算法\n3. 字段：NOT NULL + 默认值\n4. 时间：datetime 或 timestamp\n5. 软删除：is_deleted 字段\n6. 冗余：适当冗余减少 JOIN\n7. 索引：查询字段建索引\n8. 大字段：拆到扩展表\n\n反范式化：\n- 适当冗余（空间换时间）\n- 宽表（减少 JOIN）\n- 汇总表（减少计算）",
+    "keyPoints": [
+      "需求分析 → 概念设计 → 逻辑设计 → 物理设计",
+      "主键自增 ID + 软删除 + 时间字段",
+      "适当冗余减少 JOIN",
+      "大字段拆扩展表"
+    ],
+    "followUp": [
+      "什么是三大范式？",
+      "什么时候反范式化？",
+      "怎么处理一对多关系？"
+    ]
+  },
+  {
+    "id": "ij-pj-08",
+    "category": "project",
+    "difficulty": "mid",
+    "question": "你怎么做接口设计？",
+    "answer": "接口设计原则：\n\n1. RESTful 规范：\n   - URL 用名词\n   - HTTP 方法表示操作\n   - 状态码表示结果\n\n2. 参数设计：\n   - 请求参数校验\n   - 必填/选填明确\n   - 类型明确\n\n3. 响应设计：\n   - 统一格式：{ code, message, data }\n   - 错误码规范\n   - 分页参数：page, size, total\n\n4. 安全：\n   - 认证（JWT）\n   - 权限校验\n   - 参数防注入\n   - 限流\n\n5. 版本：\n   - URL 版本：/api/v1/users\n   - Header 版本\n\n6. 文档：\n   - Swagger/OpenAPI\n   - 接口文档\n   - 示例\n\n7. 兼容性：\n   - 新增字段不破坏旧接口\n   - 废弃字段标记 @Deprecated\n   - 版本管理",
+    "keyPoints": [
+      "RESTful 规范",
+      "统一响应格式 { code, message, data }",
+      "认证 + 权限 + 限流",
+      "Swagger 文档"
+    ],
+    "followUp": [
+      "什么是幂等接口？",
+      "接口版本怎么管理？",
+      "怎么处理接口兼容性？"
+    ]
+  },
+  {
+    "id": "ij-pj-09",
+    "category": "project",
+    "difficulty": "mid",
+    "question": "你怎么做异常处理？",
+    "answer": "异常处理策略：\n\n1. 异常分类：\n   - 业务异常：业务规则不满足（如余额不足）\n   - 系统异常：程序 Bug（如空指针）\n   - 外部异常：第三方服务异常\n\n2. 处理方式：\n   - 业务异常：返回友好提示\n   - 系统异常：记录日志 + 告警\n   - 外部异常：重试 + 降级\n\n3. 全局异常处理：\n   - @ControllerAdvice + @ExceptionHandler\n   - 统一响应格式\n   - 区分不同异常类型\n\n4. 日志记录：\n   - ERROR：系统异常\n   - WARN：业务异常\n   - INFO：正常流程\n   - 包含上下文信息\n\n5. 最佳实践：\n   - 不要 catch Exception\n   - 不要吞掉异常\n   - 不要用异常控制流程\n   - 自定义业务异常\n   - 异常信息要友好\n\n```java\n@ControllerAdvice\npublic class GlobalExceptionHandler {\n    @ExceptionHandler(BusinessException.class)\n    public Result handleBusiness(BusinessException e) {\n        return Result.fail(e.getCode(), e.getMessage());\n    }\n    @ExceptionHandler(Exception.class)\n    public Result handleException(Exception e) {\n        log.error(\"系统异常\", e);\n        return Result.fail(\"系统繁忙\");\n    }\n}\n```",
+    "keyPoints": [
+      "业务异常友好提示，系统异常记录日志",
+      "@ControllerAdvice 全局处理",
+      "不要吞异常，不要用异常控制流程",
+      "自定义业务异常"
+    ],
+    "followUp": [
+      "什么是异常链？",
+      "checked 和 unchecked 异常怎么选？",
+      "异常对性能的影响？"
+    ]
+  },
+  {
+    "id": "ij-pj-10",
+    "category": "project",
+    "difficulty": "mid",
+    "question": "你怎么做系统设计？",
+    "answer": "系统设计步骤：\n\n1. 需求分析：\n   - 功能需求\n   - 非功能需求（性能、可用性、扩展性）\n   - 数据量预估\n   - 并发量预估\n\n2. 概要设计：\n   - 系统架构图\n   - 模块划分\n   - 技术选型\n\n3. 详细设计：\n   - 数据库设计\n   - 接口设计\n   - 核心流程\n\n4. 技术方案：\n   - 方案对比\n   - 优缺点分析\n   - 风险评估\n\n5. 文档输出：\n   - 架构图\n   - ER 图\n   - 时序图\n   - 接口文档\n\n设计原则：\n- KISS（Keep It Simple）\n- YAGNI（You Aren't Gonna Need It）\n- SOLID\n- 高内聚低耦合\n\n关键：\n- 先理解业务\n- 量化需求\n- 简单方案优先\n- 预留扩展",
+    "keyPoints": [
+      "需求分析 → 概要设计 → 详细设计 → 技术方案",
+      "量化需求：数据量、并发量",
+      "KISS、YAGNI、SOLID",
+      "简单方案优先，预留扩展"
+    ],
+    "followUp": [
+      "什么是 C4 模型？",
+      "什么是 ADR？",
+      "怎么画架构图？"
+    ]
+  }
+]

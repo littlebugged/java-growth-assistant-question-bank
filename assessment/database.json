@@ -1,0 +1,602 @@
+[
+  {
+    "id": "db-01",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "联合索引 (a, b, c) 能命中以下哪个查询？",
+    "options": [
+      {
+        "label": "WHERE b = 1",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "WHERE a = 1 AND c = 3",
+        "value": "b",
+        "score": 2
+      },
+      {
+        "label": "WHERE a = 1 AND b = 2 AND c = 3",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "WHERE c = 3",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "最左前缀原则：(a,b,c) 可以匹配 a、(a,b)、(a,b,c)。WHERE b=1 跳过了 a，无法使用索引。"
+  },
+  {
+    "id": "db-02",
+    "dimension": "database",
+    "difficulty": "basic",
+    "title": "Redis 的 String 类型最大能存多大的 value？",
+    "options": [
+      {
+        "label": "1KB",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "1MB",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "512MB",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "无限制",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "Redis String 最大 512MB。但生产中不建议存大 value（>10KB）。"
+  },
+  {
+    "id": "db-03",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "缓存穿透的解决方案不包括？",
+    "options": [
+      {
+        "label": "布隆过滤器",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "缓存空值",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "加互斥锁",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "参数校验过滤非法请求",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "加互斥锁是缓存击穿的解决方案。缓存穿透：布隆过滤器、缓存空值、参数校验。"
+  },
+  {
+    "id": "db-04",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "Kafka 的分区数决定了什么？",
+    "options": [
+      {
+        "label": "消息的最大大小",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "同一消费组内的最大并行消费者数",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "消息的保留时间",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "生产者的吞吐量",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "b",
+    "explanation": "分区数 = 同一消费组内的最大并行消费者数。消费者数超过分区数时，多余的消费者会空闲。"
+  },
+  {
+    "id": "db-05",
+    "dimension": "database",
+    "difficulty": "advanced",
+    "title": "MySQL 的 RR 隔离级别如何避免幻读？",
+    "options": [
+      {
+        "label": "用表锁",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "MVCC 快照读 + Next-Key Lock 当前读",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "用乐观锁",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "无法避免幻读",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "快照读通过 MVCC 避免幻读；当前读通过 Next-Key Lock 避免。"
+  },
+  {
+    "id": "db-06",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "Redis 的 SETNX 命令有什么问题？",
+    "options": [
+      {
+        "label": "性能差",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "没有原子性，需要 SET key value NX EX 代替",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "不支持过期时间",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "只能设置字符串",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "单独 SETNX 不支持设置过期时间，需要两条命令（非原子）。用 SET NX EX 原子完成。"
+  },
+  {
+    "id": "db-07",
+    "dimension": "database",
+    "difficulty": "advanced",
+    "title": "分库分表后，跨库 JOIN 的替代方案？",
+    "options": [
+      {
+        "label": "用联邦查询",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "冗余数据、应用层组装、宽表、搜索引擎同步",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "用视图",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "无法解决",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "替代方案：冗余字段、应用层多次查询后组装、建宽表、同步到 ES。"
+  },
+  {
+    "id": "db-08",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "Elasticsearch 的倒排索引和 MySQL 的 B+ 树索引分别适合什么查询？",
+    "options": [
+      {
+        "label": "都一样",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "倒排索引适合全文搜索，B+ 树适合精确匹配和范围查询",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "B+ 树更快",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "倒排索引只能用于文本",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "b",
+    "explanation": "倒排索引擅长全文搜索。B+ 树擅长等值查询、范围查询和排序。"
+  },
+  {
+    "id": "db-09",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "Redis 持久化中，AOF 重写的作用是？",
+    "options": [
+      {
+        "label": "加密数据",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "压缩 AOF 文件体积，用当前数据状态生成新文件",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "备份到远程",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "切换到 RDB",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "AOF 重写：读取当前数据库状态，用最少的命令重建数据，生成新的 AOF 文件。"
+  },
+  {
+    "id": "db-10",
+    "dimension": "database",
+    "difficulty": "advanced",
+    "title": "MySQL 的 binlog 有几种格式？",
+    "options": [
+      {
+        "label": "1 种",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "2 种",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "3 种：Statement、Row、Mixed",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "4 种",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "Statement（记录 SQL）、Row（记录行变化）、Mixed（自动选择）。生产推荐 Row。"
+  },
+  {
+    "id": "db-11",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "以下 SQL 哪个不会走索引？（表有索引 idx_name(name)）",
+    "options": [
+      {
+        "label": "SELECT * FROM user WHERE name = \"张三\"",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "SELECT * FROM user WHERE LEFT(name, 1) = \"张\"",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "SELECT * FROM user WHERE name LIKE \"张%\"",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "SELECT name FROM user WHERE name = \"张三\"",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "WHERE 条件中对索引列使用函数会导致索引失效，走全表扫描。"
+  },
+  {
+    "id": "db-12",
+    "dimension": "database",
+    "difficulty": "advanced",
+    "title": "Redis 的 Hash 类型在什么情况下会从 ziplist 转为 hashtable？",
+    "options": [
+      {
+        "label": "元素数量超过 hash-max-ziplist-entries 或 value 超过 hash-max-ziplist-value",
+        "value": "a",
+        "score": 4
+      },
+      {
+        "label": "总是用 hashtable",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "取决于 key 的长度",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "不会自动转换",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "a",
+    "explanation": "当元素数超过 512 或任一 value 超过 64 字节时转为 hashtable。"
+  },
+  {
+    "id": "db-13",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "Redis 的 Pipeline 有什么作用？",
+    "options": [
+      {
+        "label": "保证事务",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "批量发送命令，减少网络 RTT",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "自动重试",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "数据加密",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "Pipeline 将多个命令打包一次发送，减少网络往返时间。不是原子操作。"
+  },
+  {
+    "id": "db-14",
+    "dimension": "database",
+    "difficulty": "advanced",
+    "title": "MySQL 的主从复制延迟怎么解决？",
+    "options": [
+      {
+        "label": "无法解决",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "强制走主库、半同步复制、并行复制",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "增加从库数量",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "用更大的服务器",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "关键读强制走主库、半同步复制、并行复制（MySQL 5.7+）。"
+  },
+  {
+    "id": "db-15",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "MySQL 的 EXPLAIN 中 type=ALL 代表什么？",
+    "options": [
+      {
+        "label": "使用了索引",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "全表扫描",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "使用了主键",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "查询结果为空",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "type 从好到差：system > const > eq_ref > ref > range > index > ALL。ALL 是全表扫描。"
+  },
+  {
+    "id": "db-16",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "Redis 的 Big Key 有什么问题？",
+    "options": [
+      {
+        "label": "只是占用内存多",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "阻塞 Redis、网络传输慢、内存不均衡、删除时阻塞",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "不会有问题",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "只影响读取速度",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "Big Key 问题：读写阻塞、网络带宽占用、集群内存不均衡、DEL 阻塞（用 UNLINK 异步删除）。"
+  },
+  {
+    "id": "db-17",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "MySQL 的覆盖索引是什么？",
+    "options": [
+      {
+        "label": "索引覆盖了所有列",
+        "value": "a",
+        "score": 2
+      },
+      {
+        "label": "查询的列都在索引中，不需要回表",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "一个索引覆盖多个表",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "主键索引",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "覆盖索引：SELECT 的列都在索引中，直接从索引树获取数据，不需要回表。"
+  },
+  {
+    "id": "db-18",
+    "dimension": "database",
+    "difficulty": "advanced",
+    "title": "Elasticsearch 的 search_after 和 scroll API 的区别？",
+    "options": [
+      {
+        "label": "没有区别",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "search_after 实时性好，scroll 适合离线遍历",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "scroll 性能更好",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "search_after 已被废弃",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "scroll 创建快照，适合全量导出。search_after 实时性好，适合深度分页。"
+  },
+  {
+    "id": "db-19",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "Kafka 的 ISR 是什么？",
+    "options": [
+      {
+        "label": "独立副本集合",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "与 leader 保持同步的副本集合",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "所有副本的集合",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "消费者组",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "ISR（In-Sync Replicas）是与 leader 保持同步的副本集合。acks=all 时需要所有 ISR 确认。"
+  },
+  {
+    "id": "db-20",
+    "dimension": "database",
+    "difficulty": "intermediate",
+    "title": "MySQL 的 MVCC 是如何实现的？",
+    "options": [
+      {
+        "label": "用锁实现",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "通过 undo log 版本链 + ReadView 实现",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "用时间戳实现",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "每次读都加共享锁",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "每行有隐藏列（trx_id、roll_pointer），undo log 形成版本链，ReadView 判断可见性。"
+  }
+]

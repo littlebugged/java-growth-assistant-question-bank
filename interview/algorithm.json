@@ -1,0 +1,182 @@
+[
+  {
+    "id": "ij-al-01",
+    "category": "algorithm",
+    "difficulty": "mid",
+    "question": "常见的排序算法和时间复杂度？",
+    "answer": "1. 冒泡排序：O(n²)，稳定\n2. 选择排序：O(n²)，不稳定\n3. 插入排序：O(n²)，稳定\n4. 希尔排序：O(n^1.3)，不稳定\n5. 归并排序：O(nlogn)，稳定\n6. 快速排序：O(nlogn) 平均，O(n²) 最坏，不稳定\n7. 堆排序：O(nlogn)，不稳定\n8. 计数排序：O(n+k)，稳定\n9. 桶排序：O(n+k)，稳定\n10. 基数排序：O(n*k)，稳定\n\nJava 中的排序：\n- Arrays.sort()：基本类型用双轴快排，对象用 TimSort（归并+插入）\n- Collections.sort()：TimSort\n- PriorityQueue：堆排序\n\n面试重点：快排、归并、堆排\n- 快排：分治，选 pivot 分两半\n- 归并：分治，先分后合\n- 堆排：建堆 + 逐个取堆顶",
+    "keyPoints": [
+      "快排 O(nlogn) 平均，最坏 O(n²)",
+      "归并 O(nlogn)，稳定",
+      "堆排 O(nlogn)，不稳定",
+      "Java 用 TimSort（归并+插入）"
+    ],
+    "followUp": [
+      "手写快排？",
+      "手写归并？",
+      "什么是 TimSort？"
+    ]
+  },
+  {
+    "id": "ij-al-02",
+    "category": "algorithm",
+    "difficulty": "mid",
+    "question": "常见的数据结构和应用场景？",
+    "answer": "1. 数组：连续内存，O(1) 随机访问\n2. 链表：非连续，O(1) 插入删除\n3. 栈：后进先出（LIFO），括号匹配、表达式求值\n4. 队列：先进先出（FIFO），BFS、任务队列\n5. 哈希表：O(1) 查找，缓存、去重\n6. 二叉树：遍历、搜索\n7. 二叉搜索树：O(logn) 查找\n8. 红黑树：自平衡 BST，TreeMap、HashMap 链表转树\n9. 堆：优先队列，TopK 问题\n10. 图：社交网络、路径规划\n\nJava 中的实现：\n- ArrayList：动态数组\n- LinkedList：双向链表\n- HashMap：哈希表（数组+链表/红黑树）\n- TreeMap：红黑树\n- PriorityQueue：堆\n- ArrayDeque：双端队列（栈+队列）",
+    "keyPoints": [
+      "数组 O(1) 访问，链表 O(1) 插入",
+      "哈希表 O(1) 查找",
+      "红黑树自平衡 BST",
+      "堆用于优先队列和 TopK"
+    ],
+    "followUp": [
+      "手写 LRU？",
+      "手写二叉树遍历？",
+      "什么是跳表？"
+    ]
+  },
+  {
+    "id": "ij-al-03",
+    "category": "algorithm",
+    "difficulty": "mid",
+    "question": "什么是时间复杂度和空间复杂度？",
+    "answer": "时间复杂度：算法执行时间与数据规模 n 的增长关系。\n\n常见复杂度（从低到高）：\n- O(1)：常数，如哈希表查找\n- O(logn)：对数，如二分查找\n- O(n)：线性，如遍历数组\n- O(nlogn)：如快排、归并\n- O(n²)：如冒泡排序\n- O(2^n)：如递归斐波那契\n- O(n!)：如全排列\n\n空间复杂度：算法额外使用的内存空间与 n 的增长关系。\n\n分析方法：\n1. 看循环嵌套层数\n2. 看递归深度\n3. 看额外数据结构大小\n\n示例：\n- 二分查找：时间 O(logn)，空间 O(1)\n- 归并排序：时间 O(nlogn)，空间 O(n)\n- 快排：时间 O(nlogn) 平均，空间 O(logn)（递归栈）",
+    "keyPoints": [
+      "O(1) < O(logn) < O(n) < O(nlogn) < O(n²)",
+      "时间复杂度看循环和递归",
+      "空间复杂度看额外内存",
+      "快排时间 O(nlogn)，空间 O(logn)"
+    ],
+    "followUp": [
+      "什么是最好、最坏、平均复杂度？",
+      "什么是均摊复杂度？",
+      "什么是主定理？"
+    ]
+  },
+  {
+    "id": "ij-al-04",
+    "category": "algorithm",
+    "difficulty": "mid",
+    "question": "什么是递归？怎么优化递归？",
+    "answer": "递归：函数调用自身。\n\n要素：\n1. 基准情况（终止条件）\n2. 递归调用（缩小问题规模）\n\n示例：阶乘\n```java\nint factorial(int n) {\n    if (n <= 1) return 1;  // 基准情况\n    return n * factorial(n - 1);  // 递归调用\n}\n```\n\n问题：\n- 栈溢出（递归太深）\n- 重复计算（如斐波那契）\n- 函数调用开销\n\n优化：\n1. 尾递归：递归调用在最后一步，编译器可以优化为循环\n2. 记忆化：缓存已计算的结果（动态规划）\n3. 改为循环：手动维护栈\n4. 动态规划：自底向上计算\n\n示例：斐波那契\n- 递归：O(2^n)\n- 记忆化：O(n)\n- 动态规划：O(n)，空间 O(1)",
+    "keyPoints": [
+      "基准情况 + 递归调用",
+      "栈溢出、重复计算、调用开销",
+      "记忆化缓存结果",
+      "动态规划自底向上"
+    ],
+    "followUp": [
+      "什么是尾递归？",
+      "递归和迭代的区别？",
+      "什么是动态规划？"
+    ]
+  },
+  {
+    "id": "ij-al-05",
+    "category": "algorithm",
+    "difficulty": "mid",
+    "question": "什么是动态规划？常见题目？",
+    "answer": "动态规划（DP）：将问题分解为重叠子问题，保存子问题的解避免重复计算。\n\n适用条件：\n1. 最优子结构：问题的最优解包含子问题的最优解\n2. 重叠子问题：子问题被多次计算\n3. 无后效性：子问题的解不受后续决策影响\n\n步骤：\n1. 定义状态（dp[i] 的含义）\n2. 状态转移方程\n3. 初始条件\n4. 计算顺序\n\n常见题目：\n1. 斐波那契数列：dp[i] = dp[i-1] + dp[i-2]\n2. 爬楼梯：dp[i] = dp[i-1] + dp[i-2]\n3. 最长公共子序列：dp[i][j] = dp[i-1][j-1]+1 或 max(dp[i-1][j], dp[i][j-1])\n4. 最长递增子序列：dp[i] = max(dp[j]+1) for j < i and arr[j] < arr[i]\n5. 背包问题：0-1 背包 dp[i][w] = max(dp[i-1][w], dp[i-1][w-wi]+vi)\n6. 编辑距离：dp[i][j] = dp[i-1][j-1] 或 min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1\n7. 零钱兑换：dp[i] = min(dp[i-cj]+1)",
+    "keyPoints": [
+      "最优子结构 + 重叠子问题 + 无后效性",
+      "定义状态 + 转移方程 + 初始条件",
+      "背包、编辑距离、最长公共子序列",
+      "和递归的区别：自底向上"
+    ],
+    "followUp": [
+      "什么是 0-1 背包？",
+      "什么是完全背包？",
+      "记忆化和自底向上的区别？"
+    ]
+  },
+  {
+    "id": "ij-al-06",
+    "category": "algorithm",
+    "difficulty": "mid",
+    "question": "什么是二分查找？变种？",
+    "answer": "二分查找：在有序数组中查找目标值。\n\n标准实现：\n```java\nint binarySearch(int[] arr, int target) {\n    int left = 0, right = arr.length - 1;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;\n        if (arr[mid] == target) return mid;\n        else if (arr[mid] < target) left = mid + 1;\n        else right = mid - 1;\n    }\n    return -1;\n}\n```\n\n时间 O(logn)，空间 O(1)。\n\n变种：\n1. 查找第一个等于目标的位置\n2. 查找最后一个等于目标的位置\n3. 查找第一个大于等于目标的位置\n4. 查找第一个大于目标的位置\n5. 旋转数组查找\n6. 山脉数组查找\n\n应用场景：\n- 有序数组查找\n- 答案二分（如最小满足条件的值）\n- 左右边界查找\n\n注意：\n- mid = left + (right - left) / 2 防止溢出\n- left <= right 还是 left < right 取决于写法",
+    "keyPoints": [
+      "O(logn) 时间",
+      "有序数组查找",
+      "变种：左右边界、旋转数组",
+      "mid = left + (right-left)/2 防溢出"
+    ],
+    "followUp": [
+      "手写左右边界查找？",
+      "旋转数组怎么查？",
+      "什么是答案二分？"
+    ]
+  },
+  {
+    "id": "ij-al-07",
+    "category": "algorithm",
+    "difficulty": "mid",
+    "question": "什么是双指针？常见用法？",
+    "answer": "双指针：用两个指针遍历数据结构。\n\n常见用法：\n\n1. 对撞指针（有序数组）：\n   - left 从头，right 从尾\n   - 如两数之和：arr[left] + arr[right] == target\n\n2. 快慢指针（链表）：\n   - fast 走两步，slow 走一步\n   - 检测环：fast 和 slow 相遇则有环\n   - 找环入口：相遇后，一个从头，一个从相遇点，再次相遇\n\n3. 同向指针（滑动窗口）：\n   - left 和 right 同向\n   - right 扩展窗口，left 收缩窗口\n   - 如最长无重复子串\n\n4. 分隔指针：\n   - 如按颜色排序（荷兰国旗）：\n   - 0 放左边，2 放右边，1 跳过\n\n5. 合并指针：\n   - 合并两个有序数组\n\n时间通常 O(n)，空间 O(1)。",
+    "keyPoints": [
+      "对撞指针：两数之和",
+      "快慢指针：检测链表环",
+      "滑动窗口：最长无重复子串",
+      "分隔指针：荷兰国旗问题"
+    ],
+    "followUp": [
+      "手写检测链表环？",
+      "什么是滑动窗口？",
+      "手写两数之和？"
+    ]
+  },
+  {
+    "id": "ij-al-08",
+    "category": "algorithm",
+    "difficulty": "mid",
+    "question": "什么是 BFS 和 DFS？区别？",
+    "answer": "BFS（广度优先搜索）：\n- 用队列实现\n- 先访问所有邻居，再访问下一层\n- 最短路径（无权图）\n- 层序遍历\n\nDFS（深度优先搜索）：\n- 用栈或递归实现\n- 先深入到底，再回溯\n- 探索所有路径\n- 前中后序遍历\n\n区别：\n- BFS 队列，DFS 栈/递归\n- BFS 最短路径，DFS 探索所有路径\n- BFS 空间大（队列存一层），DFS 空间小（递归深度）\n- BFS 适合无权最短路径，DFS 适合组合、排列\n\nJava 实现：\n- BFS：LinkedList 队列\n- DFS：递归或 Deque 栈\n\n时间都是 O(V+E)，V 是顶点数，E 是边数。",
+    "keyPoints": [
+      "BFS 队列，层序，最短路径",
+      "DFS 栈/递归，深入到底，探索所有",
+      "BFS 适合无权最短路径",
+      "DFS 适合组合、排列"
+    ],
+    "followUp": [
+      "手写二叉树层序遍历？",
+      "手写图的 BFS？",
+      "什么是双向 BFS？"
+    ]
+  },
+  {
+    "id": "ij-al-09",
+    "category": "algorithm",
+    "difficulty": "mid",
+    "question": "什么是回溯算法？常见题目？",
+    "answer": "回溯算法：在搜索过程中，当发现当前选择不能得到有效解时，回退到上一步重新选择。\n\n模板：\n```java\nvoid backtrack(路径, 选择列表) {\n    if (满足结束条件) {\n        收集结果;\n        return;\n    }\n    for (选择 : 选择列表) {\n        做选择;\n        backtrack(路径, 选择列表);\n        撤销选择;\n    }\n}\n```\n\n常见题目：\n1. 全排列：1,2,3 的所有排列\n2. 组合：C(n,k) 的所有组合\n3. 子集：所有子集\n4. N 皇后：N 个皇后不互相攻击\n5. 括号生成：有效括号组合\n6. 单词搜索：在矩阵中搜索单词\n7. 复原 IP 地址\n\n优化：\n- 剪枝：提前排除无效选择\n- 排序：避免重复结果\n- 记忆化：避免重复计算",
+    "keyPoints": [
+      "做选择 → 递归 → 撤销选择",
+      "全排列、组合、子集、N 皇后",
+      "剪枝排除无效选择",
+      "排序避免重复"
+    ],
+    "followUp": [
+      "手写全排列？",
+      "手写 N 皇后？",
+      "什么是剪枝？"
+    ]
+  },
+  {
+    "id": "ij-al-10",
+    "category": "algorithm",
+    "difficulty": "mid",
+    "question": "Java 中常用的集合类和底层数据结构？",
+    "answer": "List：\n- ArrayList：动态数组，O(1) 访问，O(n) 插入删除\n- LinkedList：双向链表，O(1) 插入删除，O(n) 访问\n- CopyOnWriteArrayList：写时复制，读多写少\n\nSet：\n- HashSet：HashMap，O(1) 操作\n- TreeSet：红黑树，有序，O(logn)\n- LinkedHashSet：HashMap + 链表，保持插入顺序\n- CopyOnWriteArraySet：写时复制\n\nMap：\n- HashMap：数组+链表/红黑树，O(1)\n- TreeMap：红黑树，有序，O(logn)\n- LinkedHashMap：HashMap + 链表，保持插入顺序\n- ConcurrentHashMap：分段锁/CAS+synchronized\n- Hashtable：全局锁（不推荐）\n\nQueue/Deque：\n- PriorityQueue：堆，O(logn)\n- ArrayDeque：双端队列（推荐做栈和队列）\n- LinkedList：也可以做队列\n\n选择：\n- 快速查找：HashMap\n- 有序：TreeMap/TreeSet\n- 线程安全：ConcurrentHashMap\n- 栈：ArrayDeque\n- 队列：ArrayDeque",
+    "keyPoints": [
+      "ArrayList 数组，LinkedList 链表",
+      "HashMap O(1)，TreeMap O(logn) 有序",
+      "ConcurrentHashMap 线程安全",
+      "ArrayDeque 推荐做栈和队列"
+    ],
+    "followUp": [
+      "HashMap 的底层原理？",
+      "ConcurrentHashMap 的实现？",
+      "什么是 fail-fast 和 fail-safe？"
+    ]
+  }
+]

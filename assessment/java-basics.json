@@ -1,0 +1,602 @@
+[
+  {
+    "id": "jb-01",
+    "dimension": "javaBasics",
+    "difficulty": "basic",
+    "title": "HashMap 在 JDK8 中什么时候会从链表转为红黑树？",
+    "options": [
+      {
+        "label": "链表长度 ≥ 8",
+        "value": "a",
+        "score": 2
+      },
+      {
+        "label": "链表长度 ≥ 8 且数组长度 ≥ 64",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "元素总数超过容量的 75%",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "每次哈希冲突都会转",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "两个条件同时满足才转树：链表长度 ≥ 8 且数组容量 ≥ 64。如果数组容量 < 64，优先扩容而不是转树。"
+  },
+  {
+    "id": "jb-02",
+    "dimension": "javaBasics",
+    "difficulty": "basic",
+    "title": "以下哪个说法是正确的？",
+    "options": [
+      {
+        "label": "String 是可变的",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "StringBuilder 是线程安全的",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "StringBuffer 用 synchronized 保证线程安全",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "三者没有区别",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "String 不可变；StringBuilder 非线程安全但更快；StringBuffer 用 synchronized 保证线程安全但有性能开销。"
+  },
+  {
+    "id": "jb-03",
+    "dimension": "javaBasics",
+    "difficulty": "intermediate",
+    "title": "ConcurrentHashMap 在 JDK8 中用什么机制保证线程安全？",
+    "options": [
+      {
+        "label": "分段锁 Segment",
+        "value": "a",
+        "score": 2
+      },
+      {
+        "label": "CAS + synchronized 锁桶头节点",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "全局 synchronized",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "ReentrantLock",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "JDK8 抛弃了分段锁，改用 CAS 写入空桶 + 对桶头节点加 synchronized，并发粒度更细。"
+  },
+  {
+    "id": "jb-04",
+    "dimension": "javaBasics",
+    "difficulty": "basic",
+    "title": "ArrayList 默认初始容量是多少？",
+    "options": [
+      {
+        "label": "8",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "10",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "16",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "32",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "ArrayList 默认初始容量 10（首次 add 时才真正分配）。扩容为原来的 1.5 倍。"
+  },
+  {
+    "id": "jb-05",
+    "dimension": "javaBasics",
+    "difficulty": "intermediate",
+    "title": "泛型擦除后，以下哪段代码会编译报错？",
+    "options": [
+      {
+        "label": "List<String> list = new ArrayList<>()",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "T obj = new T()",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "List<?> list = new ArrayList<String>()",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "public <T> T cast(Object obj) { return (T) obj; }",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "b",
+    "explanation": "类型擦除后 T 被擦除为 Object，无法 new T()。编译器直接报错。"
+  },
+  {
+    "id": "jb-06",
+    "dimension": "javaBasics",
+    "difficulty": "intermediate",
+    "title": "Stream 的 flatMap 相当于哪种操作？",
+    "options": [
+      {
+        "label": "filter + map",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "map + flatten（映射后展平）",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "reduce",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "distinct + sorted",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "flatMap = map + flatten。每个元素映射为一个 Stream，然后合并为一个。"
+  },
+  {
+    "id": "jb-07",
+    "dimension": "javaBasics",
+    "difficulty": "basic",
+    "title": "以下哪个不是接口的特性（JDK8 之前）？",
+    "options": [
+      {
+        "label": "可以有常量",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "可以有默认方法",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "方法默认 public abstract",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "支持多实现",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "JDK8 之前接口只能有常量和抽象方法。default 方法是 JDK8 才引入的。"
+  },
+  {
+    "id": "jb-08",
+    "dimension": "javaBasics",
+    "difficulty": "intermediate",
+    "title": "fail-fast 迭代器检测到并发修改后会怎样？",
+    "options": [
+      {
+        "label": "静默忽略",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "抛 ConcurrentModificationException",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "自动重试",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "返回 null",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "ArrayList、HashMap 等的迭代器是 fail-fast，通过 modCount 检测修改，抛出异常。"
+  },
+  {
+    "id": "jb-09",
+    "dimension": "javaBasics",
+    "difficulty": "advanced",
+    "title": "Optional.orElse() 和 orElseGet() 的区别？",
+    "options": [
+      {
+        "label": "没有区别",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "orElse 无论是否有值都会执行参数，orElseGet 只在为空时才执行",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "orElseGet 性能更差",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "orElse 可以抛异常",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "b",
+    "explanation": "orElse(value) 的参数总是会被求值；orElseGet(supplier) 只在 Optional 为空时才调用。"
+  },
+  {
+    "id": "jb-10",
+    "dimension": "javaBasics",
+    "difficulty": "basic",
+    "title": "以下哪种方式不能创建线程？",
+    "options": [
+      {
+        "label": "继承 Thread 类",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "实现 Runnable 接口",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "实现 Callable 接口",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "继承 Runnable 接口",
+        "value": "d",
+        "score": 4
+      }
+    ],
+    "answer": "d",
+    "explanation": "Runnable 是接口，不能被继承，只能被实现。"
+  },
+  {
+    "id": "jb-11",
+    "dimension": "javaBasics",
+    "difficulty": "intermediate",
+    "title": "以下代码输出什么？\n\nList<Integer> list = Arrays.asList(1, 2, 3);\nlist.add(4);",
+    "options": [
+      {
+        "label": "编译错误",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "运行时抛 UnsupportedOperationException",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "正常运行",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "数组越界",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "Arrays.asList 返回固定大小的 List（底层是数组），不支持 add/remove。"
+  },
+  {
+    "id": "jb-12",
+    "dimension": "javaBasics",
+    "difficulty": "basic",
+    "title": "String s1 = \"abc\"; String s2 = \"abc\"; s1 == s2 的结果？",
+    "options": [
+      {
+        "label": "true",
+        "value": "a",
+        "score": 4
+      },
+      {
+        "label": "false",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "取决于 JVM 版本",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "编译错误",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "a",
+    "explanation": "字面量会被放入字符串常量池，s1 和 s2 指向同一个对象。"
+  },
+  {
+    "id": "jb-13",
+    "dimension": "javaBasics",
+    "difficulty": "intermediate",
+    "title": "以下代码的输出？\n\nInteger a = 127;\nInteger b = 127;\nSystem.out.println(a == b);\nInteger c = 128;\nInteger d = 128;\nSystem.out.println(c == d);",
+    "options": [
+      {
+        "label": "true\ntrue",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "true\nfalse",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "false\nfalse",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "编译错误",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "Integer 缓存 -128~127，这个范围内自动装箱返回缓存对象。128 超出范围创建新对象。"
+  },
+  {
+    "id": "jb-14",
+    "dimension": "javaBasics",
+    "difficulty": "advanced",
+    "title": "ConcurrentHashMap 的 size() 方法返回精确值吗？",
+    "options": [
+      {
+        "label": "总是精确值",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "不一定，可能是近似值",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "需要加锁才能获取精确值",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "不支持 size 操作",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "ConcurrentHashMap 的 size() 在并发场景下可能返回近似值（通过 baseCount + CounterCell 累加）。"
+  },
+  {
+    "id": "jb-15",
+    "dimension": "javaBasics",
+    "difficulty": "basic",
+    "title": "以下哪种场景适合用 LinkedList 而不是 ArrayList？",
+    "options": [
+      {
+        "label": "随机访问频繁",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "头部频繁插入删除",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "遍历所有元素",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "按索引访问",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "LinkedList 头部插入删除是 O(1)，ArrayList 是 O(n)。但现代 CPU 缓存友好性让 ArrayList 在大多数场景下更快。"
+  },
+  {
+    "id": "jb-16",
+    "dimension": "javaBasics",
+    "difficulty": "intermediate",
+    "title": "以下代码的输出？\n\ntry {\n    System.out.println(\"try\");\n    return;\n} finally {\n    System.out.println(\"finally\");\n}",
+    "options": [
+      {
+        "label": "try",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "try\nfinally",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "finally",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "不输出",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "finally 块无论是否 return 都会执行（除非 JVM 退出）。"
+  },
+  {
+    "id": "jb-17",
+    "dimension": "javaBasics",
+    "difficulty": "intermediate",
+    "title": "以下哪种方式创建的对象不会被 GC 回收？",
+    "options": [
+      {
+        "label": "局部变量 new Object()",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "static 字段引用的 new Object()",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "匿名内部类创建的对象",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "WeakReference 引用的对象",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "static 字段的生命周期和类一样长，类不卸载就不会被回收。"
+  },
+  {
+    "id": "jb-18",
+    "dimension": "javaBasics",
+    "difficulty": "advanced",
+    "title": "以下哪个不是 Java 8 引入的特性？",
+    "options": [
+      {
+        "label": "Lambda 表达式",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "Stream API",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "var 关键字",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "Optional 类",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "var 关键字是 Java 10 引入的局部变量类型推断。Java 8 引入了 Lambda、Stream、Optional、默认方法等。"
+  },
+  {
+    "id": "jb-19",
+    "dimension": "javaBasics",
+    "difficulty": "basic",
+    "title": "== 和 equals() 的区别？",
+    "options": [
+      {
+        "label": "没有区别",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "== 比较引用地址，equals() 默认比较引用，可重写比较内容",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "== 比较值，equals() 比较引用",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "只有 String 才有区别",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "== 对于基本类型比较值，对于引用类型比较内存地址。equals() 是 Object 的方法，默认就是 ==，但 String 等类重写了它。"
+  },
+  {
+    "id": "jb-20",
+    "dimension": "javaBasics",
+    "difficulty": "intermediate",
+    "title": "以下哪种情况 HashMap 会扩容？",
+    "options": [
+      {
+        "label": "链表长度超过 8",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "size 超过 capacity * loadFactor",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "每次 put 都会检查",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "哈希冲突时",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "扩容只在 size 超过阈值（capacity * loadFactor）时发生。链表长度超过 8 触发的是树化，不是扩容。"
+  }
+]

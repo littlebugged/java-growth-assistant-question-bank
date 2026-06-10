@@ -1,0 +1,182 @@
+[
+  {
+    "id": "ij-cc-01",
+    "category": "concurrency",
+    "difficulty": "mid",
+    "question": "synchronized 的锁升级过程？",
+    "answer": "JDK6 引入锁升级优化，减少锁开销：\n\n无锁 → 偏向锁 → 轻量级锁 → 重量级锁\n\n1. 偏向锁：只有一个线程访问。在对象头 Mark Word 中记录线程 ID，下次同一线程进入时无需 CAS。JDK15 废弃。\n\n2. 轻量级锁：多线程交替访问（无竞争）。将 Mark Word 复制到线程的栈帧（Lock Record），用 CAS 尝试替换。失败则自旋。\n\n3. 重量级锁：多线程竞争。通过操作系统互斥量（Mutex Lock）实现，需要内核态切换，开销大。未获取锁的线程阻塞。\n\n升级不可逆。JDK6 后 synchronized 性能接近 ReentrantLock。",
+    "keyPoints": [
+      "偏向锁→轻量级锁→重量级锁",
+      "偏向锁记录线程 ID，JDK15 废弃",
+      "轻量级锁 CAS + 自旋",
+      "重量级锁用操作系统互斥量"
+    ],
+    "followUp": [
+      "自旋锁的优缺点？",
+      "什么是锁消除？",
+      "什么是锁粗化？"
+    ]
+  },
+  {
+    "id": "ij-cc-02",
+    "category": "concurrency",
+    "difficulty": "mid",
+    "question": "线程池的核心参数？执行流程？",
+    "answer": "ThreadPoolExecutor 7 个核心参数：\n1. corePoolSize：核心线程数\n2. maximumPoolSize：最大线程数\n3. keepAliveTime：非核心线程的空闲存活时间\n4. unit：时间单位\n5. workQueue：任务队列\n6. threadFactory：线程工厂\n7. handler：拒绝策略\n\n执行流程：\n1. 提交任务 → 当前线程数 < corePoolSize → 创建核心线程执行\n2. 核心线程都在忙 → 任务入队\n3. 队列满了 → 当前线程数 < maximumPoolSize → 创建非核心线程\n4. 都满了 → 执行拒绝策略\n\n四种拒绝策略：\n- AbortPolicy（默认）：抛异常\n- CallerRunsPolicy：调用者线程执行\n- DiscardPolicy：静默丢弃\n- DiscardOldestPolicy：丢弃队列最老的任务\n\n线程数设置：\n- CPU 密集型：N + 1（N = CPU 核数）\n- IO 密集型：2N 或 N / (1 - 阻塞系数)",
+    "keyPoints": [
+      "核心线程→入队→非核心线程→拒绝策略",
+      "AbortPolicy 默认抛异常",
+      "CPU 密集 N+1，IO 密集 2N",
+      "Executors 创建的线程池不推荐使用"
+    ],
+    "followUp": [
+      "为什么不推荐 Executors 创建线程池？",
+      "怎么实现线程池的动态调整？",
+      "什么是 Worker 线程？"
+    ]
+  },
+  {
+    "id": "ij-cc-03",
+    "category": "concurrency",
+    "difficulty": "mid",
+    "question": "AQS 的原理？",
+    "answer": "AQS（AbstractQueuedSynchronizer）是 JUC 并发工具的基础框架。\n\n核心思想：\n1. volatile int state：表示同步状态。0 表示未锁定，>0 表示锁定（ReentrantLock 中表示重入次数）。\n2. CLH 双向队列：获取锁失败的线程封装为 Node 加入队列尾部（CAS），前驱节点释放锁时唤醒后继节点。\n\n独占模式（ReentrantLock）：\n- lock()：CAS 修改 state，失败则入队阻塞\n- unlock()：state 减 1，为 0 时释放锁，唤醒后继\n\n共享模式（CountDownLatch、Semaphore）：\n- acquireShared()：CAS 修改 state，成功则获取\n- releaseShared()：修改 state 并唤醒后续共享节点\n\n基于 AQS 的实现：ReentrantLock、ReentrantReadWriteLock、CountDownLatch、Semaphore。",
+    "keyPoints": [
+      "volatile state + CAS + CLH 双向队列",
+      "独占模式：ReentrantLock",
+      "共享模式：CountDownLatch、Semaphore",
+      "入队用 CAS，唤醒用 LockSupport.unpark"
+    ],
+    "followUp": [
+      "ReentrantLock 的公平锁和非公平锁区别？",
+      "CountDownLatch 和 CyclicBarrier 的区别？",
+      "ReadWriteLock 的原理？"
+    ]
+  },
+  {
+    "id": "ij-cc-04",
+    "category": "concurrency",
+    "difficulty": "mid",
+    "question": "volatile 的原理？能保证原子性吗？",
+    "answer": "volatile 的作用：\n1. 可见性：修改后立即刷新到主内存，其他线程读取时从主内存获取。通过内存屏障实现。\n2. 禁止指令重排序：通过插入内存屏障（LoadLoad、StoreStore、LoadStore、StoreLoad）。\n\n不能保证原子性：\ni++ 是三步操作（读取 i → 加 1 → 写回 i），volatile 只保证单步的可见性，不保证三步的原子性。\n\n使用场景：\n- 状态标志位（volatile boolean flag）\n- DCL 单例模式（volatile 修饰 instance，防止指令重排）\n- 读多写少的场景\n\n底层实现：\n- x86：lock addl 指令（Lock 前缀 + 内存屏障）\n- ARM：DMB 内存屏障",
+    "keyPoints": [
+      "保证可见性和有序性，不保证原子性",
+      "通过内存屏障实现",
+      "DCL 单例必须用 volatile",
+      "i++ 不是原子操作"
+    ],
+    "followUp": [
+      "什么是内存屏障？",
+      "DCL 为什么需要 volatile？",
+      "volatile 和 synchronized 的区别？"
+    ]
+  },
+  {
+    "id": "ij-cc-05",
+    "category": "concurrency",
+    "difficulty": "mid",
+    "question": "ThreadLocal 的原理？内存泄漏问题？",
+    "answer": "ThreadLocal 原理：\n- 每个 Thread 有一个 ThreadLocalMap\n- ThreadLocalMap 的 key 是 ThreadLocal（弱引用），value 是存储的值\n- get()：获取当前线程的 Map，以 this 为 key 取 value\n- set()：获取当前线程的 Map，以 this 为 key 设 value\n\n内存泄漏：\n- Entry 的 key（ThreadLocal）是弱引用，GC 后 key 变 null\n- 但 value 是强引用，不会被回收\n- 线程池中线程复用，value 一直存在\n- 解决：用完后调用 remove()\n\n使用场景：\n- 数据库连接（每个线程一个连接）\n- 用户会话信息\n- 日期格式化（SimpleDateFormat 线程不安全）\n- 链路追踪（TraceId 传递）",
+    "keyPoints": [
+      "每个 Thread 有 ThreadLocalMap",
+      "key 是弱引用，value 是强引用",
+      "线程池中必须调 remove() 防止泄漏",
+      "用于连接、会话、日期格式化、链路追踪"
+    ],
+    "followUp": [
+      "ThreadLocalMap 的 hash 冲突怎么解决？",
+      "InheritableThreadLocal 的作用？",
+      "TransmittableThreadLocal 解决什么问题？"
+    ]
+  },
+  {
+    "id": "ij-cc-06",
+    "category": "concurrency",
+    "difficulty": "senior",
+    "question": "什么是死锁？怎么排查和预防？",
+    "answer": "死锁：两个或多个线程互相持有对方需要的锁，形成循环等待。\n\n四个必要条件：\n1. 互斥：资源不能共享\n2. 持有并等待：持有资源的同时等待其他资源\n3. 不可抢占：已获取的资源不能被强制释放\n4. 循环等待：形成环形等待链\n\n排查：\n1. jstack <PID>：自动检测死锁\n2. jconsole → 线程 → 检测死锁\n3. Arthas：thread -b 查看阻塞线程\n\n预防：\n1. 固定顺序加锁（打破循环等待）\n2. tryLock 设置超时（打破持有等待）\n3. 一次性申请所有资源\n4. 使用定时锁\n5. 尽量减少锁的持有时间\n6. 尽量减少锁的粒度",
+    "keyPoints": [
+      "互斥、持有等待、不可抢占、循环等待",
+      "jstack 自动检测死锁",
+      "固定顺序加锁打破循环等待",
+      "tryLock 超时打破持有等待"
+    ],
+    "followUp": [
+      "手写一个死锁的例子？",
+      "什么是活锁？和死锁的区别？",
+      "什么是饥饿？"
+    ]
+  },
+  {
+    "id": "ij-cc-07",
+    "category": "concurrency",
+    "difficulty": "mid",
+    "question": "CompletableFuture 的常用方法？",
+    "answer": "创建：\n- supplyAsync(Supplier)：异步执行有返回值\n- runAsync(Runnable)：异步执行无返回值\n\n链式调用：\n- thenApply(Function)：转换结果（同步）\n- thenApplyAsync(Function)：转换结果（异步）\n- thenAccept(Consumer)：消费结果\n- thenRun(Runnable)：执行后续操作\n- thenCompose(Function)：flatMap，返回新的 CompletableFuture\n\n组合：\n- thenCombine(CompletableFuture, BiFunction)：两个都完成后合并\n- allOf(CompletableFuture...)：全部完成\n- anyOf(CompletableFuture...)：任意一个完成\n\n异常处理：\n- exceptionally(Function)：异常时执行\n- handle(BiFunction)：无论成功失败都执行\n- whenComplete(BiConsumer)：完成时回调\n\n默认用 ForkJoinPool.commonPool()，生产建议传自定义线程池。",
+    "keyPoints": [
+      "supplyAsync 创建异步任务",
+      "thenApply 转换，thenCompose flatMap",
+      "allOf 全部完成，anyOf 任意完成",
+      "handle 处理成功和异常"
+    ],
+    "followUp": [
+      "thenCompose 和 thenApply 的区别？",
+      "怎么自定义线程池？",
+      "怎么实现超时控制？"
+    ]
+  },
+  {
+    "id": "ij-cc-08",
+    "category": "concurrency",
+    "difficulty": "mid",
+    "question": "CAS 的原理？什么是 ABA 问题？",
+    "answer": "CAS（Compare And Swap）：\n- 三个操作数：内存值 V、期望值 A、新值 B\n- 如果 V == A，则将 V 更新为 B，返回 true\n- 如果 V != A，说明被其他线程修改，返回 false\n- 是原子操作，通过 CPU 指令实现（x86 的 CMPXCHG）\n\nABA 问题：\n- 线程 1 读取 V = A\n- 线程 2 将 V 改为 B，又改回 A\n- 线程 1 CAS 成功，但中间状态已变化\n\n解决 ABA：\n- AtomicStampedReference：增加版本号（stamp）\n- AtomicMarkableReference：增加布尔标记\n\nJUC 中的 CAS：\n- AtomicInteger、AtomicLong、AtomicReference\n- Unsafe 类的 compareAndSwapInt 等方法\n\n缺点：\n- 自旋开销（竞争激烈时一直失败重试）\n- 只能保证一个变量的原子操作",
+    "keyPoints": [
+      "CAS 比较并交换，CPU 指令实现",
+      "ABA 问题：值被改回原值",
+      "AtomicStampedReference 用版本号解决",
+      "自旋开销是缺点"
+    ],
+    "followUp": [
+      "Unsafe 类是什么？",
+      "AtomicInteger 的 incrementAndGet 怎么实现的？",
+      "LongAdder 为什么比 AtomicLong 快？"
+    ]
+  },
+  {
+    "id": "ij-cc-09",
+    "category": "concurrency",
+    "difficulty": "senior",
+    "question": "ForkJoinPool 的原理？工作窃取算法？",
+    "answer": "ForkJoinPool 是 JDK7 引入的线程池，适合分治算法。\n\n核心思想：\n1. 任务拆分（Fork）：大任务拆分为小任务\n2. 结果合并（Join）：等待子任务完成，合并结果\n3. 工作窃取（Work-Stealing）：空闲线程从其他线程的双端队列尾部窃取任务\n\n实现：\n- 每个工作线程有自己的双端队列（Deque）\n- 自己的任务从队列头部取（LIFO，利用缓存）\n- 窃取的任务从队列尾部取（减少竞争）\n- 使用 RecursiveTask（有返回值）或 RecursiveAction（无返回值）\n\n使用场景：\n- parallelStream() 默认使用 ForkJoinPool.commonPool()\n- 大数据集的并行处理\n- 分治算法（归并排序、快速排序）\n\n注意：commonPool 的线程数 = CPU 核数 - 1。IO 密集型任务需要自定义线程池。",
+    "keyPoints": [
+      "Fork 拆分 + Join 合并 + Work-Stealing",
+      "每个线程有自己的双端队列",
+      "自己任务头部取（LIFO），窃取任务尾部取",
+      "parallelStream 默认用 commonPool"
+    ],
+    "followUp": [
+      "RecursiveTask 和 RecursiveAction 的区别？",
+      "commonPool 的线程数怎么设置？",
+      "为什么用双端队列而不是普通队列？"
+    ]
+  },
+  {
+    "id": "ij-cc-10",
+    "category": "concurrency",
+    "difficulty": "mid",
+    "question": "ReentrantLock 和 synchronized 的区别？怎么选择？",
+    "answer": "区别：\n1. 实现：synchronized 是 JVM 关键字，ReentrantLock 是 API 类\n2. 释放：synchronized 自动释放，ReentrantLock 必须手动 unlock()\n3. 公平锁：ReentrantLock 支持公平锁，synchronized 不支持\n4. 可中断：ReentrantLock 支持 lockInterruptibly()，synchronized 不支持\n5. 超时：ReentrantLock 支持 tryLock(timeout)，synchronized 不支持\n6. 条件变量：ReentrantLock 支持多个 Condition，synchronized 只有一个等待队列\n7. 性能：JDK6 后 synchronized 优化（锁升级），低竞争下接近\n\n选择：\n- 简单同步 → synchronized（自动释放，不会忘记 unlock）\n- 需要公平锁/可中断/超时/多条件 → ReentrantLock\n- 优先用 synchronized，满足不了再用 ReentrantLock",
+    "keyPoints": [
+      "synchronized 自动释放，ReentrantLock 手动释放",
+      "ReentrantLock 支持公平锁、可中断、超时、多条件",
+      "JDK6 后性能接近",
+      "优先用 synchronized"
+    ],
+    "followUp": [
+      "ReentrantLock 的 tryLock 怎么用？",
+      "Condition 的 await/signal 怎么用？",
+      "什么是公平锁的性能问题？"
+    ]
+  }
+]

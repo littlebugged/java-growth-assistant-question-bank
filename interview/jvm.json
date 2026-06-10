@@ -1,0 +1,218 @@
+[
+  {
+    "id": "ij-jvm-01",
+    "category": "jvm",
+    "difficulty": "mid",
+    "question": "JVM 的内存区域划分？每个区域的作用？",
+    "answer": "JVM 运行时数据区分为：\n\n1. 程序计数器（线程私有）：当前线程执行的字节码行号。唯一不会 OOM 的区域。\n\n2. 虚拟机栈（线程私有）：每个方法调用创建一个栈帧，包含局部变量表、操作数栈、动态链接、方法返回地址。递归太深会 StackOverflowError。\n\n3. 本地方法栈（线程私有）：为 Native 方法服务。\n\n4. 堆（线程共享）：存放对象实例和数组。GC 的主要区域。分为新生代（Eden + Survivor）和老年代。\n\n5. 方法区 / 元空间（线程共享）：存放类信息、常量、静态变量。JDK8 前叫永久代（堆内存），JDK8 后叫元空间（本地内存）。\n\n6. 直接内存：NIO 的 DirectByteBuffer，不受堆大小限制，但受物理内存限制。",
+    "keyPoints": [
+      "程序计数器不会 OOM",
+      "栈帧：局部变量表、操作数栈、动态链接、返回地址",
+      "堆是 GC 主要区域，分新生代和老年代",
+      "JDK8 方法区改为元空间（本地内存）"
+    ],
+    "followUp": [
+      "什么情况下会 StackOverflowError？",
+      "堆和栈的区别？",
+      "为什么要用元空间替代永久代？"
+    ]
+  },
+  {
+    "id": "ij-jvm-02",
+    "category": "jvm",
+    "difficulty": "mid",
+    "question": "JVM 垃圾回收算法有哪些？",
+    "answer": "1. 标记-清除（Mark-Sweep）：标记可回收对象，然后清除。缺点：内存碎片。\n\n2. 标记-整理（Mark-Compact）：标记后将存活对象向一端移动，清除边界外内存。没有碎片，但需要移动对象。\n\n3. 复制算法（Copying）：将内存分为两块，每次只用一块。GC 时将存活对象复制到另一块。新生代用 Eden + 2 个 Survivor（8:1:1）。\n\n4. 分代收集：根据对象存活周期将堆分为新生代和老年代，分别采用不同算法。新生代用复制算法（朝生夕死），老年代用标记-清除或标记-整理。\n\n5. 增量收集：GC 线程和用户线程交替执行，减少停顿时间。\n\n现代收集器（G1、ZGC）都是混合算法，根据 Region 类型选择不同策略。",
+    "keyPoints": [
+      "标记-清除有碎片，标记-整理无碎片但慢",
+      "复制算法用于新生代（Eden + Survivor）",
+      "分代收集：新生代复制，老年代标记-整理",
+      "G1/ZGC 是混合算法"
+    ],
+    "followUp": [
+      "为什么新生代用复制算法？",
+      "什么是三色标记法？",
+      "G1 的 Region 是怎么划分的？"
+    ]
+  },
+  {
+    "id": "ij-jvm-03",
+    "category": "jvm",
+    "difficulty": "senior",
+    "question": "常用的垃圾收集器？各自的优缺点？",
+    "answer": "1. Serial：单线程，简单高效，适合客户端。新生代复制，老年代标记-整理。STW。\n\n2. ParNew：Serial 的多线程版本，配合 CMS 使用。\n\n3. Parallel Scavenge / Parallel Old：吞吐量优先，适合后台计算。多线程并行。\n\n4. CMS（Concurrent Mark Sweep）：低停顿。初始标记（STW）→ 并发标记 → 重新标记（STW）→ 并发清除。缺点：CPU 敏感、浮动垃圾、内存碎片。JDK14 废弃。\n\n5. G1：面向服务端。将堆分为多个 Region，可预测停顿时间。Mixed GC 回收 Young + 部分 Old Region。JDK9 默认。\n\n6. ZGC：超低停顿（<10ms），支持 TB 级堆。着色指针 + 读屏障。JDK15 正式可用。\n\n选择：低延迟用 ZGC/G1，高吞吐用 Parallel。",
+    "keyPoints": [
+      "Serial 单线程，ParNew 多线程版本",
+      "CMS 低停顿但有碎片，JDK14 废弃",
+      "G1 可预测停顿，JDK9 默认",
+      "ZGC <10ms 停顿，支持 TB 级堆"
+    ],
+    "followUp": [
+      "CMS 的四个阶段？",
+      "G1 的 Mixed GC 是什么？",
+      "ZGC 的着色指针原理？"
+    ]
+  },
+  {
+    "id": "ij-jvm-04",
+    "category": "jvm",
+    "difficulty": "mid",
+    "question": "类加载机制？什么是双亲委派？",
+    "answer": "类加载过程：加载 → 验证 → 准备 → 解析 → 初始化。\n\n加载：通过类全名获取字节流 → 转化为方法区的运行时数据结构 → 生成 Class 对象。\n\n验证：文件格式、元数据、字节码、符号引用验证。\n\n准备：为类变量分配内存并设零值（int→0，boolean→false）。注意不是初始值。\n\n解析：将符号引用替换为直接引用。\n\n初始化：执行类构造器 <clinit>（static 块和 static 变量赋值）。\n\n双亲委派：收到加载请求先委派给父加载器，父加载器无法加载时才自己加载。\n\n层次：Bootstrap → Extension → Application → 自定义。\n\n作用：保证核心类不被篡改（如 java.lang.String）。\n\n打破双亲委派：SPI（JDBC）、热部署（Tomcat）、OSGi。",
+    "keyPoints": [
+      "加载→验证→准备→解析→初始化",
+      "准备阶段设零值，初始化阶段设初始值",
+      "双亲委派保证核心类不被篡改",
+      "SPI、热部署打破双亲委派"
+    ],
+    "followUp": [
+      "什么时候会触发类的初始化？",
+      "Tomcat 怎么打破双亲委派的？",
+      "什么是 SPI？"
+    ]
+  },
+  {
+    "id": "ij-jvm-05",
+    "category": "jvm",
+    "difficulty": "senior",
+    "question": "线上 OOM 问题怎么排查？",
+    "answer": "排查步骤：\n\n1. 确认 OOM 类型：\n   - Java heap space：堆内存不足\n   - Metaspace：元空间不足（加载太多类）\n   - GC overhead limit exceeded：GC 耗时过长\n   - Direct buffer memory：直接内存不足\n   - Unable to create new native thread：线程数超限\n\n2. 获取堆转储：\n   - 启动参数：-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/\n   - 命令：jmap -dump:format=b,file=heap.hprof <pid>\n\n3. 分析堆转储：\n   - MAT（Memory Analyzer Tool）：查看对象引用链、内存泄漏嫌疑\n   - Dominator Tree：按大小排序对象\n   - Leak Suspects：自动检测泄漏嫌疑\n\n4. 常见原因：\n   - 内存泄漏：集合只加不删、未关闭的资源、ThreadLocal 未 remove\n   - 内存溢出：数据量太大、缓存无上限、一次性加载大文件\n\n5. 解决：\n   - 修复泄漏代码\n   - 增大堆内存（-Xmx）\n   - 使用弱引用/软引用\n   - 分页处理大数据",
+    "keyPoints": [
+      "确认 OOM 类型（heap/metaspace/direct/thread）",
+      "HeapDumpOnOutOfMemoryError 自动导出堆转储",
+      "MAT 分析 Dominator Tree 和 Leak Suspects",
+      "常见原因：内存泄漏（集合只加不删）和内存溢出"
+    ],
+    "followUp": [
+      "怎么用 MAT 分析堆转储？",
+      "怎么用 Arthas 排查 OOM？",
+      "内存泄漏和内存溢出的区别？"
+    ]
+  },
+  {
+    "id": "ij-jvm-06",
+    "category": "jvm",
+    "difficulty": "mid",
+    "question": "JVM 调优的常用参数和策略？",
+    "answer": "常用参数：\n- -Xms / -Xmx：堆初始大小 / 最大大小（建议设为一样）\n- -Xmn：新生代大小\n- -XX:SurvivorRatio：Eden 和 Survivor 的比例\n- -XX:MetaspaceSize：元空间初始大小\n- -XX:+UseG1GC：使用 G1 收集器\n- -XX:MaxGCPauseMillis：最大 GC 停顿时间\n- -XX:+HeapDumpOnOutOfMemoryError：OOM 时导出堆转储\n- -Xlog:gc*：打印 GC 日志（JDK9+）\n\n调优策略：\n1. 选择合适的收集器（低延迟用 G1/ZGC，高吞吐用 Parallel）\n2. 设置合理的堆大小（一般为物理内存的 1/4 ~ 1/2）\n3. 新生代大小根据对象存活率调整\n4. 监控 GC 日志，分析停顿时间和频率\n5. 避免过早优化，先用默认参数\n\n工具：jps、jstat、jmap、jstack、Arthas、VisualVM、JConsole。",
+    "keyPoints": [
+      "-Xms 和 -Xmx 设为一样避免动态扩缩",
+      "选择合适的收集器",
+      "监控 GC 日志分析停顿",
+      "避免过早优化"
+    ],
+    "followUp": [
+      "怎么查看 GC 日志？",
+      "怎么用 jstat 监控 GC？",
+      "什么时候需要调优？"
+    ]
+  },
+  {
+    "id": "ij-jvm-07",
+    "category": "jvm",
+    "difficulty": "mid",
+    "question": "什么是逃逸分析？有什么优化？",
+    "answer": "逃逸分析：分析对象的作用域，判断对象是否逃逸出方法或线程。\n\n逃逸类型：\n- 方法逃逸：对象被外部方法引用（如作为参数传递）\n- 线程逃逸：对象被其他线程访问\n\n优化：\n1. 栈上分配：对象不逃逸时在栈上分配，方法结束自动回收，不触发 GC。\n2. 标量替换：将对象拆解为基本类型变量（如 Point 拆为 x, y）。\n3. 锁消除：对象不逃逸出线程时，去除同步锁。\n\nJDK7+ 默认开启逃逸分析（-XX:+DoEscapeAnalysis）。\n\n示例：\n```java\npublic int test() {\n    Point p = new Point(1, 2);  // 不逃逸\n    return p.x + p.y;           // 可能被优化为 return 1 + 2\n}\n```",
+    "keyPoints": [
+      "分析对象是否逃逸出方法/线程",
+      "栈上分配：不逃逸的对象在栈上分配",
+      "标量替换：对象拆为基本类型",
+      "锁消除：不逃逸的对象去除同步锁"
+    ],
+    "followUp": [
+      "怎么验证逃逸分析是否生效？",
+      "逃逸分析的局限性？",
+      "什么是标量替换？"
+    ]
+  },
+  {
+    "id": "ij-jvm-08",
+    "category": "jvm",
+    "difficulty": "senior",
+    "question": "什么是 JIT 编译？什么是 AOT 编译？",
+    "answer": "JIT（Just-In-Time）编译：\n- 运行时将热点代码编译为本地机器码\n- 解释器先解释执行，多次调用后 JIT 编译\n- 分层编译：C1（客户端编译器，编译快）→ C2（服务端编译器，优化多）\n- 热点探测：方法调用计数器 + 回边计数器\n- 优化：方法内联、逃逸分析、循环展开、公共子表达式消除\n\nAOT（Ahead-Of-Time）编译：\n- 编译期将 Java 代码编译为本地机器码\n- GraalVM Native Image：AOT 编译为可执行文件\n- 优点：启动快、内存占用小、无预热\n- 缺点：编译慢、不支持反射（需要配置）、峰值性能可能不如 JIT\n\n选择：\n- 长期运行的服务：JIT（预热后性能更好）\n- Serverless / CLI 工具：AOT（启动快）",
+    "keyPoints": [
+      "JIT 运行时编译，AOT 编译期编译",
+      "JIT 分层编译：C1（快）+ C2（优化）",
+      "热点探测：方法调用计数器 + 回边计数器",
+      "GraalVM Native Image 是 AOT 方案"
+    ],
+    "followUp": [
+      "什么是方法内联？",
+      "JIT 的优化手段有哪些？",
+      "GraalVM 的优势？"
+    ]
+  },
+  {
+    "id": "ij-jvm-09",
+    "category": "jvm",
+    "difficulty": "mid",
+    "question": "怎么排查线上 CPU 100% 的问题？",
+    "answer": "排查步骤：\n\n1. top 命令找到 CPU 高的 Java 进程 PID\n   top -c\n\n2. top -Hp PID 找到 CPU 高的线程 TID\n   top -Hp <PID>\n\n3. 将 TID 转为十六进制\n   printf \"%x\" <TID>\n\n4. jstack 导出线程堆栈，搜索该线程\n   jstack <PID> | grep <十六进制TID> -A 30\n\n5. 分析堆栈，常见原因：\n   - 死循环\n   - 频繁 Full GC（用 jstat -gcutil 确认）\n   - 死锁（jstack 会自动检测）\n   - 正则表达式回溯\n   - 序列化/反序列化异常\n\n6. 其他工具：\n   - Arthas：thread -n 3 查看最忙的 3 个线程\n   - async-profiler：火焰图分析\n   - jvisualvm：CPU 采样",
+    "keyPoints": [
+      "top → top -Hp → printf \"%x\" → jstack | grep",
+      "常见原因：死循环、频繁 GC、死锁、正则回溯",
+      "Arthas thread -n 3 查看最忙线程",
+      "async-profiler 生成火焰图"
+    ],
+    "followUp": [
+      "怎么用 Arthas 排查？",
+      "什么是火焰图？怎么分析？",
+      "频繁 Full GC 导致 CPU 高怎么解决？"
+    ]
+  },
+  {
+    "id": "ij-jvm-10",
+    "category": "jvm",
+    "difficulty": "mid",
+    "question": "什么是内存泄漏？Java 中常见的内存泄漏场景？",
+    "answer": "内存泄漏：对象不再使用但无法被 GC 回收。\n\n常见场景：\n\n1. 集合只加不删：List、Map 不断添加对象但不清理。\n   解决：使用弱引用集合（WeakHashMap）或定期清理。\n\n2. 未关闭的资源：数据库连接、IO 流、Socket 未关闭。\n   解决：try-with-resources 自动关闭。\n\n3. ThreadLocal 未 remove：线程池中线程复用，ThreadLocal 的 value 不会被回收。\n   解决：用完后调用 remove()。\n\n4. 静态集合：static List 持有对象引用，类不卸载就不会回收。\n   解决：及时清理或用软引用。\n\n5. 内部类持有外部类引用：非静态内部类隐式持有外部类引用。\n   解决：用静态内部类。\n\n6. 监听器和回调：注册监听器后未注销。\n   解决：弱引用或及时注销。",
+    "keyPoints": [
+      "集合只加不删",
+      "ThreadLocal 未 remove",
+      "未关闭的资源",
+      "静态集合持有对象引用"
+    ],
+    "followUp": [
+      "怎么用 MAT 检测内存泄漏？",
+      "WeakHashMap 的原理？",
+      "ThreadLocal 的内存泄漏问题？"
+    ]
+  },
+  {
+    "id": "ij-jvm-11",
+    "category": "jvm",
+    "difficulty": "junior",
+    "question": "什么是对象的创建过程？",
+    "answer": "1. 类加载检查：检查类是否已加载，未加载则先执行类加载。\n\n2. 分配内存：\n   - 指针碰撞：内存规整时（Serial、ParNew），移动指针\n   - 空闲列表：内存不规整时（CMS），从列表中找空闲块\n   - 线程安全：CAS + 失败重试 或 TLAB（Thread Local Allocation Buffer）\n\n3. 初始化零值：将分配的内存设为零值（int→0，boolean→false）。\n\n4. 设置对象头：Mark Word（哈希码、GC 分代年龄、锁标志）+ 类型指针（指向类元数据）。\n\n5. 执行 <init>：执行构造方法，按程序员意愿初始化。",
+    "keyPoints": [
+      "类加载检查 → 分配内存 → 初始化零值 → 设置对象头 → 执行构造方法",
+      "TLAB 保证线程安全",
+      "指针碰撞（内存规整）或空闲列表（不规整）",
+      "Mark Word 存哈希码、GC 年龄、锁标志"
+    ],
+    "followUp": [
+      "什么是 TLAB？",
+      "对象头里有什么？",
+      "对象在内存中的布局？"
+    ]
+  },
+  {
+    "id": "ij-jvm-12",
+    "category": "jvm",
+    "difficulty": "mid",
+    "question": "强引用、软引用、弱引用、虚引用的区别和使用场景？",
+    "answer": "1. 强引用（Strong）：Object o = new Object()。不会被回收，即使 OOM。\n\n2. 软引用（SoftReference）：内存不足时回收。适合缓存。\n   SoftReference<byte[]> soft = new SoftReference<>(new byte[1024*1024]);\n\n3. 弱引用（WeakReference）：下次 GC 一定回收。WeakHashMap 的 Entry 用弱引用。\n   WeakReference<Object> weak = new WeakReference<>(new Object());\n\n4. 虚引用（PhantomReference）：随时回收，必须配合 ReferenceQueue。用于跟踪对象被回收的状态（如 DirectByteBuffer 的 Cleaner）。\n\n使用场景：\n- 软引用：缓存（图片缓存、数据缓存）\n- 弱引用：ThreadLocalMap 的 Entry、WeakHashMap\n- 虚引用：堆外内存回收（DirectByteBuffer）",
+    "keyPoints": [
+      "强引用不回收，软引用内存不足回收，弱引用下次 GC 回收",
+      "软引用适合缓存",
+      "弱引用用于 ThreadLocal、WeakHashMap",
+      "虚引用用于堆外内存回收"
+    ],
+    "followUp": [
+      "WeakHashMap 的使用场景？",
+      "ThreadLocal 为什么用弱引用？",
+      "什么是 Cleaner？"
+    ]
+  }
+]

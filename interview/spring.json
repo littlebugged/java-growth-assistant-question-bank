@@ -1,0 +1,182 @@
+[
+  {
+    "id": "ij-sp-01",
+    "category": "spring",
+    "difficulty": "mid",
+    "question": "Spring IoC 的原理？Bean 的生命周期？",
+    "answer": "IoC（控制反转）：将对象的创建和依赖管理交给 Spring 容器，而不是手动 new。\n\n实现原理：\n1. 读取配置（注解/XML）→ BeanDefinition\n2. BeanFactoryPostProcessor 处理\n3. 实例化（反射调用构造方法）\n4. 属性注入（@Autowired）\n5. Aware 接口回调（BeanNameAware、ApplicationContextAware）\n6. BeanPostProcessor.postProcessBeforeInitialization\n7. @PostConstruct → InitializingBean.afterPropertiesSet → 自定义 init-method\n8. BeanPostProcessor.postProcessAfterInitialization（AOP 代理在此创建）\n9. 使用\n10. @PreDestroy → DisposableBean.destroy → 自定义 destroy-method\n\n作用域：singleton（默认）、prototype、request、session。",
+    "keyPoints": [
+      "IoC 将对象创建交给容器",
+      "BeanDefinition → 实例化 → 属性注入 → 初始化 → 使用 → 销毁",
+      "BeanPostProcessor 是 AOP 的入口",
+      "@PostConstruct 在 InitializingBean 之前"
+    ],
+    "followUp": [
+      "BeanFactory 和 ApplicationContext 的区别？",
+      "BeanPostProcessor 的应用？",
+      "什么是 FactoryBean？"
+    ]
+  },
+  {
+    "id": "ij-sp-02",
+    "category": "spring",
+    "difficulty": "mid",
+    "question": "Spring AOP 的原理？什么场景下使用？",
+    "answer": "AOP（面向切面编程）：将横切关注点（日志、事务、权限）从业务代码中分离。\n\n核心概念：\n- 切面（Aspect）：横切关注点的模块化\n- 连接点（Join Point）：程序执行的某个位置（方法执行）\n- 切入点（Pointcut）：匹配连接点的表达式\n- 通知（Advice）：在切入点执行的动作（Before、After、Around、AfterReturning、AfterThrowing）\n\n实现方式：\n1. JDK 动态代理：基于接口，Proxy.newProxyInstance()\n2. CGLIB：基于继承，生成目标类的子类\n3. Spring Boot 2.x 默认 CGLIB\n\n使用场景：\n- 日志记录（方法调用日志）\n- 事务管理（@Transactional）\n- 权限校验\n- 性能监控\n- 缓存（@Cacheable）",
+    "keyPoints": [
+      "切面、连接点、切入点、通知",
+      "JDK 动态代理（接口）或 CGLIB（继承）",
+      "Spring Boot 2.x 默认 CGLIB",
+      "@Transactional 就是 AOP 实现"
+    ],
+    "followUp": [
+      "@Around 和其他通知的执行顺序？",
+      "切入点表达式怎么写？",
+      "AOP 失效的场景？"
+    ]
+  },
+  {
+    "id": "ij-sp-03",
+    "category": "spring",
+    "difficulty": "mid",
+    "question": "Spring 事务的传播行为？@Transactional 失效的场景？",
+    "answer": "七种传播行为：\n1. REQUIRED（默认）：有事务就加入，没有就新建\n2. SUPPORTS：有事务就加入，没有就非事务执行\n3. MANDATORY：必须在事务中，否则抛异常\n4. REQUIRES_NEW：新建事务，挂起当前事务\n5. NOT_SUPPORTED：非事务执行，挂起当前事务\n6. NEVER：非事务执行，有事务就抛异常\n7. NESTED：嵌套事务（保存点），外层回滚则内层也回滚\n\n失效场景：\n1. 方法非 public（CGLIB 代理限制）\n2. 自调用（this.method() 不走代理）\n3. 异常被 catch 没有重新抛出\n4. rollbackFor 默认只回滚 RuntimeException\n5. 数据库引擎不支持（MyISAM）\n6. 传播行为配置错误\n7. 代理未生效（未被 Spring 管理）",
+    "keyPoints": [
+      "REQUIRED 默认，有就加入没有就新建",
+      "REQUIRES_NEW 新建事务，挂起当前",
+      "方法非 public 会失效",
+      "自调用不走代理会失效"
+    ],
+    "followUp": [
+      "REQUIRED 和 NESTED 的区别？",
+      "怎么解决自调用失效问题？",
+      "事务的隔离级别？"
+    ]
+  },
+  {
+    "id": "ij-sp-04",
+    "category": "spring",
+    "difficulty": "mid",
+    "question": "Spring Boot 的自动配置原理？",
+    "answer": "@SpringBootApplication = @SpringBootConfiguration + @EnableAutoConfiguration + @ComponentScan\n\n自动配置流程：\n1. @EnableAutoConfiguration 通过 @Import(AutoConfigurationImportSelector) 导入配置类\n2. AutoConfigurationImportSelector 读取 META-INF/spring.factories（JDK8）或 META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports（JDK17）\n3. 获取所有自动配置类的全限定名\n4. 通过 @Conditional 系列注解过滤：\n   - @ConditionalOnClass：classpath 中有指定类\n   - @ConditionalOnMissingBean：容器中没有指定 Bean\n   - @ConditionalOnProperty：配置属性满足条件\n5. 符合条件的配置类生效，注册 Bean\n\n示例：DataSourceAutoConfiguration\n- @ConditionalOnClass(DataSource.class)\n- 读取 spring.datasource.* 配置\n- 创建 DataSource Bean",
+    "keyPoints": [
+      "@EnableAutoConfiguration 导入配置类",
+      "读取 spring.factories 获取配置类列表",
+      "@Conditional 系列注解过滤",
+      "@ConditionalOnMissingBean 实现自定义覆盖"
+    ],
+    "followUp": [
+      "怎么自定义一个 Starter？",
+      "@Conditional 系列注解有哪些？",
+      "spring.factories 和 imports 文件的区别？"
+    ]
+  },
+  {
+    "id": "ij-sp-05",
+    "category": "spring",
+    "difficulty": "senior",
+    "question": "Spring 的循环依赖怎么解决？",
+    "answer": "三级缓存：\n1. singletonObjects：完整的 Bean（一级缓存）\n2. earlySingletonObjects：早期引用，可能是代理对象（二级缓存）\n3. singletonFactories：ObjectFactory，用于生成早期引用（三级缓存）\n\n解决流程（A 依赖 B，B 依赖 A）：\n1. 创建 A → 实例化 A → 将 A 的 ObjectFactory 放入三级缓存\n2. 填充属性发现依赖 B → 创建 B\n3. 创建 B → 实例化 B → 填充属性发现依赖 A\n4. 从三级缓存获取 A 的 ObjectFactory → 调用 getObject() 获取早期引用\n5. 将 A 的早期引用放入二级缓存，从三级缓存删除\n6. B 完成初始化 → 放入一级缓存\n7. A 注入 B → A 完成初始化 → 放入一级缓存\n\n只能解决 setter 注入的循环依赖，构造器注入无法解决（需要完整对象）。\n\n三级缓存的意义：如果 A 需要 AOP 代理，ObjectFactory 可以在需要时创建代理对象。",
+    "keyPoints": [
+      "三级缓存：singletonObjects、earlySingletonObjects、singletonFactories",
+      "只能解决 setter 注入，构造器注入不行",
+      "ObjectFactory 延迟创建代理对象",
+      "Spring Boot 2.6+ 默认禁止循环依赖"
+    ],
+    "followUp": [
+      "为什么需要三级缓存而不是两级？",
+      "@Lazy 怎么解决循环依赖？",
+      "构造器注入怎么解决循环依赖？"
+    ]
+  },
+  {
+    "id": "ij-sp-06",
+    "category": "spring",
+    "difficulty": "mid",
+    "question": "Spring Cloud 的核心组件？",
+    "answer": "1. 服务注册与发现：\n   - Eureka（Netflix，已维护模式）\n   - Nacos（阿里，推荐）\n   - Consul\n\n2. 负载均衡：\n   - Ribbon（Netflix，已维护模式）\n   - Spring Cloud LoadBalancer（推荐）\n\n3. 远程调用：\n   - OpenFeign（声明式 HTTP 客户端）\n\n4. 服务熔断与降级：\n   - Hystrix（Netflix，已维护模式）\n   - Sentinel（阿里，推荐）\n   - Resilience4j\n\n5. 网关：\n   - Spring Cloud Gateway（推荐）\n   - Zuul（Netflix，已维护模式）\n\n6. 配置中心：\n   - Nacos Config\n   - Spring Cloud Config\n   - Apollo\n\n7. 链路追踪：\n   - Sleuth + Zipkin\n   - SkyWalking\n\n推荐技术栈：Nacos + Spring Cloud LoadBalancer + Sentinel + Gateway",
+    "keyPoints": [
+      "Nacos 做注册中心和配置中心",
+      "Spring Cloud LoadBalancer 替代 Ribbon",
+      "Sentinel 替代 Hystrix",
+      "Gateway 替代 Zuul"
+    ],
+    "followUp": [
+      "Nacos 的 AP 和 CP 模式？",
+      "Sentinel 的限流原理？",
+      "Gateway 的过滤器链？"
+    ]
+  },
+  {
+    "id": "ij-sp-07",
+    "category": "spring",
+    "difficulty": "mid",
+    "question": "Spring 中常用的设计模式？",
+    "answer": "1. 工厂模式：BeanFactory、ApplicationContext 创建 Bean\n2. 单例模式：Bean 默认 singleton 作用域\n3. 代理模式：AOP 使用 JDK 动态代理 / CGLIB\n4. 模板方法模式：JdbcTemplate、RestTemplate、RedisTemplate\n5. 观察者模式：ApplicationEvent + ApplicationListener\n6. 适配器模式：HandlerAdapter（DispatcherServlet）\n7. 策略模式：HandlerMapping 根据请求选择处理器\n8. 装饰器模式：BeanWrapper 包装 Bean\n9. 责任链模式：Filter Chain、Interceptor Chain\n10. 建造者模式：BeanDefinitionBuilder\n\n最常考：工厂模式、单例模式、代理模式、模板方法模式、观察者模式。",
+    "keyPoints": [
+      "BeanFactory 工厂模式",
+      "Bean 默认单例模式",
+      "AOP 代理模式",
+      "JdbcTemplate 模板方法模式"
+    ],
+    "followUp": [
+      "Spring 怎么实现单例的？",
+      "JdbcTemplate 的模板方法模式？",
+      "Spring 事件机制的原理？"
+    ]
+  },
+  {
+    "id": "ij-sp-08",
+    "category": "spring",
+    "difficulty": "mid",
+    "question": "Spring MVC 的请求处理流程？",
+    "answer": "1. 客户端发送请求到 DispatcherServlet\n2. DispatcherServlet 调用 HandlerMapping 根据 URL 找到 Handler（Controller 方法）\n3. 返回 HandlerExecutionChain（Handler + 拦截器链）\n4. DispatcherServlet 调用 HandlerAdapter 执行 Handler\n5. HandlerAdapter 调用具体的 Controller 方法\n6. Controller 返回 ModelAndView（或 @ResponseBody 直接返回数据）\n7. DispatcherServlet 调用 ViewResolver 解析视图\n8. 渲染视图并返回响应\n\n注解方式（@RestController）：\n- @ResponseBody → HttpMessageConverter 将返回值转为 JSON\n- 不需要 ViewResolver\n\n核心组件：\n- DispatcherServlet：前端控制器\n- HandlerMapping：请求映射\n- HandlerAdapter：处理器适配器\n- ViewResolver：视图解析器\n- Interceptor：拦截器",
+    "keyPoints": [
+      "DispatcherServlet → HandlerMapping → HandlerAdapter → Controller",
+      "@ResponseBody 用 HttpMessageConverter 转 JSON",
+      "HandlerExecutionChain = Handler + 拦截器",
+      "ViewResolver 解析视图"
+    ],
+    "followUp": [
+      "拦截器和过滤器的区别？",
+      "@RequestBody 的原理？",
+      "全局异常处理怎么实现？"
+    ]
+  },
+  {
+    "id": "ij-sp-09",
+    "category": "spring",
+    "difficulty": "mid",
+    "question": "Spring 的 @Async 异步注解原理？",
+    "answer": "@Async 的原理：\n1. @EnableAsync 开启异步支持\n2. 通过 AsyncAnnotationBeanPostProcessor 拦截 @Async 方法\n3. 使用 AOP 代理，在方法调用时提交到线程池\n4. 返回 Future/CompletableFuture 接收结果\n\n使用：\n```java\n@Async(\"myExecutor\")\npublic CompletableFuture<String> asyncTask() {\n    // 异步执行\n    return CompletableFuture.completedFuture(\"result\");\n}\n```\n\n注意事项：\n1. 需要 @EnableAsync 开启\n2. 方法必须是 public\n3. 不能自调用（和 @Transactional 一样）\n4. 默认使用 SimpleAsyncTaskExecutor（每次新建线程，不推荐）\n5. 建议自定义线程池\n6. 异常处理：实现 AsyncUncaughtExceptionHandler",
+    "keyPoints": [
+      "@EnableAsync 开启，AOP 代理实现",
+      "默认 SimpleAsyncTaskExecutor 不推荐",
+      "需要自定义线程池",
+      "不能自调用"
+    ],
+    "followUp": [
+      "怎么自定义异步线程池？",
+      "怎么处理异步方法的异常？",
+      "CompletableFuture 怎么配合 @Async 使用？"
+    ]
+  },
+  {
+    "id": "ij-sp-10",
+    "category": "spring",
+    "difficulty": "mid",
+    "question": "Spring Boot 的 starter 是怎么工作的？怎么自定义 Starter？",
+    "answer": "Starter 的工作原理：\n1. starter 是一个依赖集合（pom.xml），引入相关依赖\n2. 自动配置类通过 @Conditional 条件判断是否生效\n3. 通过 @ConfigurationProperties 绑定配置项\n4. META-INF/spring.factories 注册自动配置类\n\n自定义 Starter 步骤：\n1. 创建 xxx-spring-boot-autoconfigure 模块\n2. 编写自动配置类（@Configuration + @Conditional）\n3. 编写配置属性类（@ConfigurationProperties）\n4. 在 META-INF/spring.factories 中注册\n5. 创建 xxx-spring-boot-starter 模块，引入 autoconfigure 依赖\n\n示例：\n```java\n@Configuration\n@ConditionalOnClass(MyService.class)\n@EnableConfigurationProperties(MyProperties.class)\npublic class MyAutoConfiguration {\n    @Bean\n    @ConditionalOnMissingBean\n    public MyService myService(MyProperties props) {\n        return new MyService(props.getName());\n    }\n}\n```",
+    "keyPoints": [
+      "starter 是依赖集合 + 自动配置类",
+      "@Conditional 条件判断是否生效",
+      "@ConfigurationProperties 绑定配置",
+      "spring.factories 注册配置类"
+    ],
+    "followUp": [
+      "@ConfigurationProperties 的原理？",
+      "@ConditionalOnMissingBean 的作用？",
+      "Spring Boot 3.x 的变化？"
+    ]
+  }
+]

@@ -1,0 +1,272 @@
+[
+  {
+    "id": "ij-01",
+    "category": "java",
+    "difficulty": "junior",
+    "question": "HashMap 的底层原理？JDK7 和 JDK8 有什么区别？",
+    "answer": "HashMap 底层是数组 + 链表（JDK7）或数组 + 链表/红黑树（JDK8）。\n\nJDK7：数组 + 链表，使用头插法。多线程扩容时可能形成环形链表导致死循环。\n\nJDK8：数组 + 链表/红黑树。链表长度 ≥ 8 且数组长度 ≥ 64 时转为红黑树（O(n) → O(logn)）。使用尾插法，解决了环形链表问题。\n\n扩容机制：默认容量 16，负载因子 0.75，当 size > capacity * loadFactor 时扩容为 2 倍。扩容时重新计算所有元素的位置（hash & (newCap - 1)），要么在原位置，要么在原位置 + oldCap。",
+    "keyPoints": [
+      "数组 + 链表/红黑树",
+      "链表长度 ≥ 8 且数组 ≥ 64 转红黑树",
+      "JDK7 头插法有环形链表问题，JDK8 尾插法解决",
+      "默认容量 16，负载因子 0.75，2 倍扩容"
+    ],
+    "followUp": [
+      "为什么用红黑树不用 AVL 树？",
+      "HashMap 的 key 可以为 null 吗？为什么？",
+      "ConcurrentHashMap 怎么实现线程安全的？"
+    ]
+  },
+  {
+    "id": "ij-02",
+    "category": "java",
+    "difficulty": "mid",
+    "question": "ConcurrentHashMap 怎么实现线程安全的？JDK7 和 JDK8 的区别？",
+    "answer": "JDK7：使用 Segment 分段锁（继承 ReentrantLock），默认 16 个 Segment，每个 Segment 维护一个 HashEntry 数组。不同 Segment 可以并发写入，但 Segment 内是串行的。并发度 = Segment 数量。\n\nJDK8：抛弃分段锁，使用 CAS + synchronized。对每个桶的头节点加 synchronized，CAS 操作写入空桶。并发粒度更细（锁住单个桶而不是整个 Segment）。引入 CounterCell 数组分散统计 size，避免 CAS 竞争。",
+    "keyPoints": [
+      "JDK7 分段锁（16 个 Segment）",
+      "JDK8 CAS + synchronized 锁桶头节点",
+      "JDK8 并发粒度更细",
+      "CounterCell 数组分散统计 size"
+    ],
+    "followUp": [
+      "size() 方法怎么保证准确性的？",
+      "JDK8 中什么情况用 CAS 什么情况用 synchronized？",
+      "和 Hashtable 的区别？"
+    ]
+  },
+  {
+    "id": "ij-03",
+    "category": "java",
+    "difficulty": "junior",
+    "question": "String、StringBuilder、StringBuffer 的区别？",
+    "answer": "String：不可变（final char[]），每次修改创建新对象。字符串常量池复用字面量。\n\nStringBuilder：可变，非线程安全，性能最好。单线程场景优先使用。\n\nStringBuffer：可变，线程安全（方法加 synchronized），性能略差于 StringBuilder。\n\n选择策略：少量字符串操作用 String，单线程大量操作用 StringBuilder，多线程用 StringBuffer。实际开发中 99% 用 StringBuilder。",
+    "keyPoints": [
+      "String 不可变，StringBuilder/StringBuffer 可变",
+      "StringBuilder 非线程安全，StringBuffer 线程安全",
+      "单线程用 StringBuilder，多线程用 StringBuffer",
+      "String 不可变是因为 final char[] + 不可继承"
+    ],
+    "followUp": [
+      "String 为什么设计成不可变的？",
+      "String.intern() 方法的作用？",
+      "JDK9 中 String 为什么改成 byte[]？"
+    ]
+  },
+  {
+    "id": "ij-04",
+    "category": "java",
+    "difficulty": "mid",
+    "question": "Java 泛型的类型擦除是什么？会带来什么问题？",
+    "answer": "Java 泛型在编译时检查类型安全，编译后泛型信息被擦除（Type Erasure）。List<String> 和 List<Integer> 在运行时是同一个类（List）。\n\n带来的问题：\n1. 不能 new T() 或 new T[]（类型信息被擦除）\n2. 泛型参数不能是基本类型（必须用包装类）\n3. 不能用 instanceof 判断泛型类型\n4. 不能创建泛型数组（new List<String>[10] 编译错误）\n5. 不同泛型参数的重载会编译错误（类型擦除后签名相同）\n\n解决：传入 Class<T> 参数，用反射创建实例。",
+    "keyPoints": [
+      "编译时检查，运行时擦除",
+      "不能 new T()、不能用基本类型、不能 instanceof",
+      "不同泛型参数不能重载",
+      "用 Class<T> 参数绕过擦除"
+    ],
+    "followUp": [
+      "通配符 ? 和 T 的区别？",
+      "PECS 原则是什么？",
+      "什么是桥方法（Bridge Method）？"
+    ]
+  },
+  {
+    "id": "ij-05",
+    "category": "java",
+    "difficulty": "junior",
+    "question": "== 和 equals() 的区别？",
+    "answer": "==：基本类型比较值，引用类型比较内存地址。\n\nequals()：Object 默认实现就是 ==。String、Integer 等类重写了 equals() 来比较内容。\n\n重写 equals() 的规则：\n1. 自反性：x.equals(x) = true\n2. 对称性：x.equals(y) = y.equals(x)\n3. 传递性：x.equals(y) && y.equals(z) → x.equals(z)\n4. 一致性：多次调用结果相同\n5. 非空性：x.equals(null) = false\n\n注意：重写 equals() 必须重写 hashCode()，否则在 HashMap 中会出现问题。",
+    "keyPoints": [
+      "== 比较地址，equals() 比较内容",
+      "重写 equals() 必须重写 hashCode()",
+      "String 重写了 equals() 比较字符内容",
+      "Integer 在 -128~127 范围内 == 返回 true（缓存）"
+    ],
+    "followUp": [
+      "为什么重写 equals() 必须重写 hashCode()？",
+      "String 的 equals() 怎么实现的？",
+      "Objects.equals() 有什么好处？"
+    ]
+  },
+  {
+    "id": "ij-06",
+    "category": "java",
+    "difficulty": "mid",
+    "question": "接口和抽象类的区别？什么时候用接口什么时候用抽象类？",
+    "answer": "区别：\n1. 抽象类可以有构造方法、成员变量、非抽象方法；接口只能有常量和抽象方法（JDK8 前）\n2. 类只能继承一个抽象类，但可以实现多个接口\n3. 抽象类表示 \"is-a\" 关系，接口表示 \"can-do\" 关系\n4. 接口中的方法默认 public，抽象类可以有各种访问修饰符\n\nJDK8 新特性：接口可以有 default 方法和 static 方法。\n\n选择策略：\n- 需要共享代码（复用实现）→ 抽象类\n- 需要多继承 → 接口\n- 定义行为规范 → 接口\n- 有状态（成员变量）→ 抽象类",
+    "keyPoints": [
+      "抽象类单继承，接口多实现",
+      "抽象类有构造方法和状态，接口没有",
+      "JDK8 接口支持 default 和 static 方法",
+      "is-a 用抽象类，can-do 用接口"
+    ],
+    "followUp": [
+      "JDK8 的 default 方法解决了什么问题？",
+      "接口的 default 方法和抽象类的普通方法有什么区别？",
+      "函数式接口是什么？"
+    ]
+  },
+  {
+    "id": "ij-07",
+    "category": "java",
+    "difficulty": "mid",
+    "question": "Stream API 的常用操作？什么是惰性求值？",
+    "answer": "Stream API 分为中间操作（惰性）和终端操作（触发计算）。\n\n中间操作（返回新 Stream，惰性求值）：\n- filter(Predicate)：过滤\n- map(Function)：映射\n- flatMap(Function)：映射后展平\n- sorted()：排序\n- distinct()：去重\n- limit(n)：取前 n 个\n- skip(n)：跳过前 n 个\n\n终端操作（触发实际计算）：\n- collect(Collector)：收集到集合\n- forEach(Consumer)：遍历\n- reduce()：归约\n- count()：计数\n- findFirst()：第一个\n- anyMatch() / allMatch() / noneMatch()：匹配\n\n惰性求值：中间操作不会立即执行，只有遇到终端操作时才触发整个流水线的计算。这样可以优化执行（如短路操作）。",
+    "keyPoints": [
+      "中间操作惰性求值，终端操作触发计算",
+      "filter/map/flatMap/sorted 是中间操作",
+      "collect/forEach/reduce 是终端操作",
+      "惰性求值可以优化执行（短路）"
+    ],
+    "followUp": [
+      "parallelStream() 的原理？",
+      "Collectors 的常用方法？",
+      "Stream 可以复用吗？"
+    ]
+  },
+  {
+    "id": "ij-08",
+    "category": "java",
+    "difficulty": "junior",
+    "question": "Java 异常体系？checked 和 unchecked 异常的区别？",
+    "answer": "Java 异常体系：\n- Throwable（根类）\n  - Error（严重错误，不可恢复，如 OOM、StackOverflow）\n  - Exception\n    - RuntimeException（unchecked，运行时异常）\n    - 其他 Exception（checked，编译时异常）\n\nchecked 异常：编译器强制处理（try-catch 或 throws 声明）。如 IOException、SQLException。\n\nunchecked 异常：RuntimeException 及其子类，编译器不强制处理。如 NullPointerException、IndexOutOfBoundsException、ClassCastException。\n\n最佳实践：\n- 不要用异常控制业务流程\n- catch 要具体，不要 catch Exception\n- finally 中不要 return\n- try-with-resources 自动关闭资源",
+    "keyPoints": [
+      "Error 不可恢复，Exception 可处理",
+      "RuntimeException 是 unchecked，其他是 checked",
+      "不要用异常控制业务流程",
+      "catch 要具体，finally 不要 return"
+    ],
+    "followUp": [
+      "try-with-resources 的原理？",
+      "自定义异常应该继承 Exception 还是 RuntimeException？",
+      "异常对性能有什么影响？"
+    ]
+  },
+  {
+    "id": "ij-09",
+    "category": "java",
+    "difficulty": "mid",
+    "question": "Java 中的反射机制？什么场景下使用？",
+    "answer": "反射是 Java 在运行时获取类信息（字段、方法、构造器、注解）并操作的能力。\n\n核心类：Class（类元数据）、Field（字段）、Method（方法）、Constructor（构造器）。\n\n获取 Class 对象的三种方式：\n1. Class.forName(\"全类名\")\n2. 对象.getClass()\n3. 类名.class\n\n使用场景：\n- 框架（Spring IoC、MyBatis）动态创建 Bean\n- 注解处理（运行时读取注解信息）\n- 动态代理（JDK Proxy）\n- 测试框架访问私有成员\n- 序列化/反序列化\n\n缺点：性能低（比直接调用慢几倍）、破坏封装性、编译期无法检查类型安全。",
+    "keyPoints": [
+      "运行时获取类信息并操作",
+      "Class.forName() / getClass() / .class 获取 Class",
+      "框架大量使用（Spring、MyBatis）",
+      "性能低、破坏封装、编译期无法检查"
+    ],
+    "followUp": [
+      "反射的性能优化方法？",
+      "Class.forName() 和 ClassLoader.loadClass() 的区别？",
+      "什么是类型擦除对反射的影响？"
+    ]
+  },
+  {
+    "id": "ij-10",
+    "category": "java",
+    "difficulty": "mid",
+    "question": "Java 的序列化和反序列化？什么是 serialVersionUID？",
+    "answer": "序列化：将对象转换为字节流（用于网络传输或持久化）。反序列化：将字节流还原为对象。\n\n实现 Serializable 接口即可序列化。transient 关键字修饰的字段不参与序列化。\n\nserialVersionUID：序列化版本号，用于验证序列化和反序列化的类是否一致。不指定时 JVM 会根据类结构自动生成，但类结构变化后会变化，导致反序列化失败。建议显式指定。\n\n其他序列化方案：\n- JSON（Jackson、Gson）：可读性好，跨语言\n- Protobuf：二进制，高效，跨语言\n- Hessian：二进制，Java 生态\n- Kryo：二进制，Java 生态，性能最好",
+    "keyPoints": [
+      "实现 Serializable 接口",
+      "transient 修饰的字段不序列化",
+      "serialVersionUID 用于版本验证",
+      "JSON/Protobuf/Hessian 是替代方案"
+    ],
+    "followUp": [
+      "serialVersionUID 不一致会怎样？",
+      "为什么推荐用 JSON 而不是 Java 原生序列化？",
+      "Externalizable 和 Serializable 的区别？"
+    ]
+  },
+  {
+    "id": "ij-11",
+    "category": "java",
+    "difficulty": "junior",
+    "question": "ArrayList 和 LinkedList 的区别？什么时候用哪个？",
+    "answer": "ArrayList：基于动态数组，连续内存。随机访问 O(1)，尾部插入 O(1)（均摊），中间插入删除 O(n)（需要移动元素）。CPU 缓存友好。\n\nLinkedList：基于双向链表，非连续内存。随机访问 O(n)，头尾插入删除 O(1)，中间插入删除 O(1)（但找到位置需要 O(n)）。\n\n实际性能：由于 CPU 缓存行（Cache Line）的存在，ArrayList 在大多数场景下比 LinkedList 更快。即使是频繁的中间插入，ArrayList 的内存拷贝（System.arraycopy）也比 LinkedList 的内存分配（new Node）快。\n\n选择：99% 用 ArrayList。只在需要频繁在头部插入删除（如实现队列）时考虑 LinkedList，但 ArrayDeque 通常更好。",
+    "keyPoints": [
+      "ArrayList 基于数组，LinkedList 基于双向链表",
+      "CPU 缓存友好性让 ArrayList 大多数场景更快",
+      "随机访问 ArrayList O(1)，LinkedList O(n)",
+      "99% 用 ArrayList，队列用 ArrayDeque"
+    ],
+    "followUp": [
+      "ArrayList 的扩容机制？",
+      "ArrayList 和 Vector 的区别？",
+      "CopyOnWriteArrayList 的原理？"
+    ]
+  },
+  {
+    "id": "ij-12",
+    "category": "java",
+    "difficulty": "mid",
+    "question": "Java 中的动态代理？JDK 动态代理和 CGLIB 的区别？",
+    "answer": "动态代理：在运行时动态生成代理类，实现方法增强（AOP 的基础）。\n\nJDK 动态代理：\n- 基于接口，目标类必须实现接口\n- 使用 Proxy.newProxyInstance() 创建代理\n- 底层通过反射调用目标方法\n- 性能略差（反射开销）\n\nCGLIB：\n- 基于继承，通过生成目标类的子类实现代理\n- 不需要接口，但不能代理 final 类和 final 方法\n- 底层通过 ASM 字节码框架生成字节码\n- 性能略好（直接调用，无反射开销）\n\nSpring AOP 选择策略：\n- 目标类有接口 → JDK 动态代理（默认）\n- 目标类无接口 → CGLIB\n- Spring Boot 2.x 默认使用 CGLIB（proxyTargetClass=true）",
+    "keyPoints": [
+      "JDK 动态代理基于接口，CGLIB 基于继承",
+      "JDK Proxy 用反射，CGLIB 用 ASM 字节码",
+      "CGLIB 不能代理 final 类/方法",
+      "Spring Boot 2.x 默认 CGLIB"
+    ],
+    "followUp": [
+      "动态代理的应用场景？",
+      "手写一个 JDK 动态代理？",
+      "什么是方法拦截器（MethodInterceptor）？"
+    ]
+  },
+  {
+    "id": "ij-13",
+    "category": "java",
+    "difficulty": "mid",
+    "question": "Java 中的注解（Annotation）？什么是元注解？",
+    "answer": "注解是 Java 5 引入的元数据机制，用于为代码添加额外信息。\n\n元注解（修饰注解的注解）：\n- @Target：注解可以用在哪里（TYPE、METHOD、FIELD 等）\n- @Retention：注解保留到什么时候（SOURCE、CLASS、RUNTIME）\n- @Documented：是否包含在 Javadoc 中\n- @Inherited：子类是否继承父类的注解\n\n自定义注解：\n```java\n@Target(ElementType.METHOD)\n@Retention(RetentionPolicy.RUNTIME)\npublic @interface MyAnnotation {\n    String value() default \"\";\n    int priority() default 0;\n}\n```\n\n注解处理方式：\n- 编译期处理（APT，如 Lombok）\n- 运行时处理（反射读取注解，如 Spring @Transactional）",
+    "keyPoints": [
+      "注解是元数据，不直接影响代码逻辑",
+      "四个元注解：@Target、@Retention、@Documented、@Inherited",
+      "@Retention 决定保留到 SOURCE/CLASS/RUNTIME",
+      "编译期 APT 或运行时反射处理"
+    ],
+    "followUp": [
+      "Spring 怎么处理注解的？",
+      "Lombok 是怎么工作的？",
+      "什么是 APT（Annotation Processing Tool）？"
+    ]
+  },
+  {
+    "id": "ij-14",
+    "category": "java",
+    "difficulty": "junior",
+    "question": "Java 中 final、finally、finalize 的区别？",
+    "answer": "final：修饰类（不能继承）、方法（不能重写）、变量（不能重新赋值，但引用类型的内部状态可以修改）。\n\nfinally：try-catch-finally 中的 finally 块，无论是否异常都会执行（除非 JVM 退出）。常用于资源释放。\n\nfinalize：Object 的方法，GC 回收对象前调用。已被废弃（JDK9+），不推荐使用。原因：调用时机不确定、可能导致对象复活、性能差。\n\n最佳实践：\n- 用 try-with-resources 替代 finally 关闭资源\n- 用 Cleaner 替代 finalize\n- final 变量在多线程中保证可见性（JMM 的 final 语义）",
+    "keyPoints": [
+      "final 修饰类/方法/变量",
+      "finally 无论如何都执行",
+      "finalize 已废弃，不要用",
+      "用 try-with-resources 替代 finally"
+    ],
+    "followUp": [
+      "final 变量在多线程中的语义？",
+      "try-with-resources 的原理？",
+      "finally 中的 return 会怎样？"
+    ]
+  },
+  {
+    "id": "ij-15",
+    "category": "java",
+    "difficulty": "mid",
+    "question": "什么是函数式接口？Lambda 表达式的原理？",
+    "answer": "函数式接口：只有一个抽象方法的接口（可以有 default 和 static 方法）。用 @FunctionalInterface 注解标记。\n\n常见函数式接口：\n- Function<T, R>：T → R\n- Predicate<T>：T → boolean\n- Consumer<T>：T → void\n- Supplier<T>：() → T\n- BiFunction<T, U, R>：(T, U) → R\n\nLambda 表达式本质：匿名内部类的语法糖。\n- 编译时生成一个私有静态方法（Lambda 体）\n- 使用 invokedynamic 指令动态绑定到函数式接口\n- 第一次调用时通过 MethodHandle 创建实例\n\n与匿名内部类的区别：\n1. Lambda 只能用于函数式接口\n2. Lambda 没有 this（指向外部类）\n3. Lambda 不会生成额外的 .class 文件\n4. Lambda 延迟绑定（invokedynamic）",
+    "keyPoints": [
+      "只有一个抽象方法的接口",
+      "@FunctionalInterface 注解",
+      "本质是匿名内部类的语法糖",
+      "使用 invokedynamic 指令"
+    ],
+    "followUp": [
+      "方法引用有几种形式？",
+      "Lambda 的变量捕获规则？",
+      "为什么 Lambda 中不能修改外部局部变量？"
+    ]
+  }
+]

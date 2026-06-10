@@ -1,0 +1,602 @@
+[
+  {
+    "id": "cc-01",
+    "dimension": "concurrency",
+    "difficulty": "intermediate",
+    "title": "以下代码的输出？\n\nint i = 0;\nfor (int j = 0; j < 10; j++) {\n    new Thread(() -> i++).start();\n}\n// 假设 i 是 AtomicInteger\nSystem.out.println(i.get());",
+    "options": [
+      {
+        "label": "10",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "不确定，可能小于 10",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "0",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "编译错误",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "i++ 不是原子操作（读-改-写），多线程并发执行会导致数据竞争。结果不确定。"
+  },
+  {
+    "id": "cc-02",
+    "dimension": "concurrency",
+    "difficulty": "basic",
+    "title": "线程池的队列满了之后会发生什么？",
+    "options": [
+      {
+        "label": "自动扩容",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "创建非核心线程（未达到最大线程数时），否则执行拒绝策略",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "阻塞等待",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "丢弃任务",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "线程池执行顺序：核心线程 → 入队 → 非核心线程 → 拒绝策略。"
+  },
+  {
+    "id": "cc-03",
+    "dimension": "concurrency",
+    "difficulty": "basic",
+    "title": "以下代码有死锁风险吗？\n\nsynchronized(lockA) {\n    synchronized(lockB) { }\n}\n// 另一个线程\nsynchronized(lockB) {\n    synchronized(lockA) { }\n}",
+    "options": [
+      {
+        "label": "没有死锁风险",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "有，两个线程以不同顺序获取锁",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "只有在高并发下才会死锁",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "synchronized 不会死锁",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "经典死锁：线程 1 持有 lockA 等 lockB，线程 2 持有 lockB 等 lockA，形成循环等待。"
+  },
+  {
+    "id": "cc-04",
+    "dimension": "concurrency",
+    "difficulty": "basic",
+    "title": "Thread.sleep(1000) 和 Thread.wait(1000) 的区别？",
+    "options": [
+      {
+        "label": "完全一样",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "sleep 不释放锁，wait 释放锁",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "sleep 释放锁，wait 不释放",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "sleep 是静态方法，wait 不是",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "b",
+    "explanation": "sleep 不释放锁，到时间自动唤醒。wait 必须在 synchronized 块中调用，释放锁，需要 notify 唤醒。"
+  },
+  {
+    "id": "cc-05",
+    "dimension": "concurrency",
+    "difficulty": "intermediate",
+    "title": "以下哪个不是 AQS 的实现类？",
+    "options": [
+      {
+        "label": "ReentrantLock",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "CountDownLatch",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "ConcurrentHashMap",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "Semaphore",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "ConcurrentHashMap 在 JDK8 用 CAS + synchronized，不基于 AQS。其他三个都基于 AQS。"
+  },
+  {
+    "id": "cc-06",
+    "dimension": "concurrency",
+    "difficulty": "basic",
+    "title": "以下代码的输出？\n\nExecutorService pool = Executors.newFixedThreadPool(2);\nfor (int i = 0; i < 5; i++) {\n    pool.submit(() -> System.out.println(Thread.currentThread().getName()));\n}",
+    "options": [
+      {
+        "label": "5 个不同的线程名",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "最多 2 个不同的线程名",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "1 个线程名",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "不确定",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "b",
+    "explanation": "FixedThreadPool 只有 2 个核心线程，5 个任务由这 2 个线程轮流执行。"
+  },
+  {
+    "id": "cc-07",
+    "dimension": "concurrency",
+    "difficulty": "basic",
+    "title": "以下哪种方式不能实现线程间通信？",
+    "options": [
+      {
+        "label": "wait/notify",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "BlockingQueue",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "volatile",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "ThreadLocal",
+        "value": "d",
+        "score": 4
+      }
+    ],
+    "answer": "d",
+    "explanation": "ThreadLocal 是线程隔离的，每个线程有自己的副本，不能用于线程间通信。"
+  },
+  {
+    "id": "cc-08",
+    "dimension": "concurrency",
+    "difficulty": "advanced",
+    "title": "CompletableFuture.exceptionally() 和 handle() 的区别？",
+    "options": [
+      {
+        "label": "没有区别",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "exceptionally 只处理异常，handle 同时处理正常结果和异常",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "exceptionally 性能更好",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "handle 是同步的",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "exceptionally 只在异常时执行。handle 无论成功还是异常都会执行。"
+  },
+  {
+    "id": "cc-09",
+    "dimension": "concurrency",
+    "difficulty": "intermediate",
+    "title": "以下代码有什么问题？\n\nprivate volatile boolean flag = false;\n// 线程 A\nwhile (!flag) { /* 忙等 */ }\n// 线程 B\nflag = true;",
+    "options": [
+      {
+        "label": "没有问题",
+        "value": "a",
+        "score": 2
+      },
+      {
+        "label": "忙等浪费 CPU，应该用 wait/notify",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "volatile 不能这样用",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "会有可见性问题",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "功能上没问题，但忙等会持续消耗 CPU。应该用 wait/notify、CountDownLatch 等。"
+  },
+  {
+    "id": "cc-10",
+    "dimension": "concurrency",
+    "difficulty": "advanced",
+    "title": "synchronized 和 ReentrantLock 的性能对比？",
+    "options": [
+      {
+        "label": "ReentrantLock 总是更快",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "JDK6 之后 synchronized 经过优化，低竞争下性能接近",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "synchronized 总是更快",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "性能完全一样",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "JDK6 引入锁升级后，synchronized 在低竞争场景下性能和 ReentrantLock 接近。"
+  },
+  {
+    "id": "cc-11",
+    "dimension": "concurrency",
+    "difficulty": "intermediate",
+    "title": "synchronized 锁升级的正确顺序是？",
+    "options": [
+      {
+        "label": "无锁 → 轻量级锁 → 偏向锁 → 重量级锁",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "无锁 → 偏向锁 → 轻量级锁 → 重量级锁",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "偏向锁 → 无锁 → 重量级锁",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "轻量级锁 → 偏向锁 → 重量级锁",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "JDK6 的锁升级：无锁 → 偏向锁 → 轻量级锁 → 重量级锁。升级不可逆。"
+  },
+  {
+    "id": "cc-12",
+    "dimension": "concurrency",
+    "difficulty": "basic",
+    "title": "线程池的拒绝策略默认是哪种？",
+    "options": [
+      {
+        "label": "CallerRunsPolicy",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "AbortPolicy",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "DiscardPolicy",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "DiscardOldestPolicy",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "默认 AbortPolicy，直接抛 RejectedExecutionException。"
+  },
+  {
+    "id": "cc-13",
+    "dimension": "concurrency",
+    "difficulty": "intermediate",
+    "title": "volatile 能保证 i++ 的原子性吗？",
+    "options": [
+      {
+        "label": "能",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "不能，i++ 是读-改-写三步操作",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "只有在单线程下能",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "取决于 JVM 实现",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "i++ 拆分为读取、加 1、写回。volatile 不保证这三步的原子性。用 AtomicInteger。"
+  },
+  {
+    "id": "cc-14",
+    "dimension": "concurrency",
+    "difficulty": "intermediate",
+    "title": "ThreadLocal 的 key 是什么类型的引用？",
+    "options": [
+      {
+        "label": "强引用",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "弱引用",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "软引用",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "虚引用",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "ThreadLocalMap 的 Entry 继承 WeakReference，key 是弱引用。GC 后 key 变 null，但 value 是强引用。"
+  },
+  {
+    "id": "cc-15",
+    "dimension": "concurrency",
+    "difficulty": "advanced",
+    "title": "CountDownLatch 的 countDown() 方法内部用什么实现？",
+    "options": [
+      {
+        "label": "synchronized",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "CAS 操作 state 字段（基于 AQS）",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "ReentrantLock",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "volatile",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "b",
+    "explanation": "CountDownLatch 基于 AQS，state 初始化为计数值，countDown() 用 CAS 递减 state。"
+  },
+  {
+    "id": "cc-16",
+    "dimension": "concurrency",
+    "difficulty": "basic",
+    "title": "以下哪个不是死锁的必要条件？",
+    "options": [
+      {
+        "label": "互斥",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "持有并等待",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "不可抢占",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "线程优先级不同",
+        "value": "d",
+        "score": 4
+      }
+    ],
+    "answer": "d",
+    "explanation": "死锁四必要条件：互斥、持有并等待、不可抢占、循环等待。线程优先级与死锁无关。"
+  },
+  {
+    "id": "cc-17",
+    "dimension": "concurrency",
+    "difficulty": "intermediate",
+    "title": "CompletableFuture.allOf() 和 anyOf() 区别？",
+    "options": [
+      {
+        "label": "allOf 等全部完成，anyOf 等任意一个完成",
+        "value": "a",
+        "score": 4
+      },
+      {
+        "label": "没有区别",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "allOf 是串行的，anyOf 是并行的",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "anyOf 更快",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "a",
+    "explanation": "allOf 等待所有 Future 完成；anyOf 等待任意一个完成就返回。"
+  },
+  {
+    "id": "cc-18",
+    "dimension": "concurrency",
+    "difficulty": "intermediate",
+    "title": "ReentrantLock 比 synchronized 多了什么能力？",
+    "options": [
+      {
+        "label": "可重入",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "公平锁、可中断、tryLock 超时、多条件变量",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "性能更好",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "不需要手动释放",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "synchronized 也有可重入性。ReentrantLock 额外支持公平锁、lockInterruptibly()、tryLock(timeout)、多个 Condition。"
+  },
+  {
+    "id": "cc-19",
+    "dimension": "concurrency",
+    "difficulty": "advanced",
+    "title": "ForkJoinPool 的工作窃取算法是指？",
+    "options": [
+      {
+        "label": "主线程分配任务给子线程",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "空闲线程从其他线程的双端队列尾部窃取任务",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "优先级高的线程抢优先级低的任务",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "GC 线程窃取应用线程的内存",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "每个工作线程有自己的双端队列，从头部取任务；空闲线程从其他线程队列的尾部窃取任务。"
+  },
+  {
+    "id": "cc-20",
+    "dimension": "concurrency",
+    "difficulty": "intermediate",
+    "title": "CompletableFuture.supplyAsync() 默认用什么线程池？",
+    "options": [
+      {
+        "label": "当前线程",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "ForkJoinPool.commonPool()",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "newFixedThreadPool",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "没有线程池",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "不指定 Executor 时，默认使用 ForkJoinPool.commonPool()。生产环境建议传自定义线程池。"
+  }
+]

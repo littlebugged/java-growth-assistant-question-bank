@@ -1,0 +1,182 @@
+[
+  {
+    "id": "ij-rd-01",
+    "category": "redis",
+    "difficulty": "mid",
+    "question": "Redis 的五种基本数据类型和使用场景？",
+    "answer": "1. String：\n   - 缓存、计数器、分布式锁、Session\n   - 底层：SDS（Simple Dynamic String）\n\n2. List：\n   - 消息队列、最新列表、时间线\n   - 底层：quicklist（ziplist + 链表）\n\n3. Hash：\n   - 对象存储（用户信息、商品详情）\n   - 底层：ziplist（小数据）或 hashtable\n\n4. Set：\n   - 标签、共同好友、去重\n   - 底层：intset（全整数）或 hashtable\n\n5. Sorted Set（ZSet）：\n   - 排行榜、延迟队列、范围查询\n   - 底层：ziplist（小数据）或 skiplist + hashtable\n\n其他：\n- Bitmap：签到、布隆过滤器\n- HyperLogLog：UV 统计（基数估算）\n- Geo：地理位置\n- Stream：消息队列（5.0+）",
+    "keyPoints": [
+      "String 缓存/计数器/分布式锁",
+      "Hash 存对象，ZSet 做排行榜",
+      "底层有 ziplist、hashtable、skiplist 等",
+      "HyperLogLog 做 UV 统计"
+    ],
+    "followUp": [
+      "ZSet 的跳表原理？",
+      "Hash 的 ziplist 转 hashtable 条件？",
+      "Stream 和 List 的区别？"
+    ]
+  },
+  {
+    "id": "ij-rd-02",
+    "category": "redis",
+    "difficulty": "mid",
+    "question": "Redis 的持久化方式？RDB 和 AOF 的区别？",
+    "answer": "RDB（快照）：\n- fork 子进程，将内存数据写入 .rdb 文件\n- 触发：save 命令、bgsave 命令、自动触发（配置 save 规则）\n- 优点：文件小、恢复快\n- 缺点：可能丢失最后一次快照后的数据\n\nAOF（追加日志）：\n- 将每条写命令追加到 .aof 文件\n- 同步策略：always（每次写）、everysec（每秒，默认）、no（操作系统决定）\n- 优点：数据更安全\n- 缺点：文件大、恢复慢\n- AOF 重写：压缩文件，用当前数据状态生成新文件\n\n混合持久化（Redis 4.0+）：\n- AOF 重写时将 RDB 快照写在 AOF 头部\n- 兼顾 RDB 的恢复速度和 AOF 的数据安全\n\n选择：\n- 数据安全优先：AOF（everysec）\n- 恢复速度优先：RDB\n- 推荐：混合持久化",
+    "keyPoints": [
+      "RDB 快照：文件小恢复快，可能丢数据",
+      "AOF 日志：数据安全，文件大恢复慢",
+      "AOF 重写压缩文件",
+      "4.0+ 混合持久化兼顾两者"
+    ],
+    "followUp": [
+      "bgsave 的原理？",
+      "AOF 重写的过程？",
+      "Redis 为什么用单线程？"
+    ]
+  },
+  {
+    "id": "ij-rd-03",
+    "category": "redis",
+    "difficulty": "mid",
+    "question": "缓存穿透、缓存击穿、缓存雪崩的区别和解决方案？",
+    "answer": "1. 缓存穿透：查询不存在的数据，缓存永远 miss，请求直达 DB。\n   解决：\n   - 布隆过滤器（拦截不存在的 key）\n   - 缓存空值（设短过期时间）\n   - 参数校验\n\n2. 缓存击穿：热点 key 过期瞬间，大量请求打到 DB。\n   解决：\n   - 互斥锁（SETNX，只让一个请求查 DB）\n   - 逻辑过期（不设 TTL，异步更新）\n   - 永不过期 + 异步更新\n\n3. 缓存雪崩：大量 key 同时过期或 Redis 宕机。\n   解决：\n   - 随机过期时间（避免同时过期）\n   - Redis 集群（高可用）\n   - 多级缓存（本地缓存 + 分布式缓存）\n   - 限流降级\n   - 熔断",
+    "keyPoints": [
+      "穿透：查询不存在的数据 → 布隆过滤器",
+      "击穿：热点 key 过期 → 互斥锁",
+      "雪崩：大量 key 同时过期 → 随机过期时间",
+      "多级缓存：本地缓存 + Redis"
+    ],
+    "followUp": [
+      "布隆过滤器的原理？",
+      "怎么实现互斥锁？",
+      "什么是逻辑过期？"
+    ]
+  },
+  {
+    "id": "ij-rd-04",
+    "category": "redis",
+    "difficulty": "mid",
+    "question": "Redis 的分布式锁怎么实现？有什么问题？",
+    "answer": "实现：\n```\nSET lock_key unique_value NX EX 30\n```\n- NX：不存在才设置（互斥）\n- EX：设置过期时间（防止死锁）\n- unique_value：标识持有者（释放时验证）\n\n释放（Lua 脚本保证原子性）：\n```lua\nif redis.call(\"get\", KEYS[1]) == ARGV[1] then\n    return redis.call(\"del\", KEYS[1])\nelse\n    return 0\nend\n```\n\n问题：\n1. 锁过期但业务未完成 → 看门狗机制自动续期\n2. Redis 主从切换锁丢失 → Redlock 算法\n3. 不可重入 → 用 Hash 记录重入次数\n4. 不可等待 → 用发布订阅通知等待者\n\nRedisson：生产级分布式锁实现，支持看门狗、可重入、公平锁、读写锁、Redlock。",
+    "keyPoints": [
+      "SET NX EX + Lua 释放",
+      "unique_value 标识持有者",
+      "看门狗自动续期",
+      "Redisson 是生产级方案"
+    ],
+    "followUp": [
+      "Redlock 算法的原理？",
+      "什么是看门狗机制？",
+      "Redis 分布式锁和 ZooKeeper 分布式锁的区别？"
+    ]
+  },
+  {
+    "id": "ij-rd-05",
+    "category": "redis",
+    "difficulty": "senior",
+    "question": "Redis 的集群方案？哨兵和 Cluster 的区别？",
+    "answer": "1. 主从复制：\n   - 一主多从，主写从读\n   - 异步复制，可能丢数据\n   - 手动故障转移\n\n2. 哨兵（Sentinel）：\n   - 监控主从节点的健康状态\n   - 主节点故障时自动故障转移（选举新主）\n   - 通知客户端新的主节点地址\n   - 不支持数据分片\n\n3. Cluster：\n   - 数据分片：16384 个哈希槽，CRC16(key) % 16384\n   - 每个节点负责一部分槽\n   - 自动故障转移\n   - 支持数据分片\n   - 不支持跨槽事务和 Lua\n\n选择：\n- 小规模（< 10GB）：哨兵\n- 大规模（> 10GB）：Cluster\n- 需要数据分片：Cluster\n- 不需要分片：哨兵",
+    "keyPoints": [
+      "哨兵：自动故障转移，不支持分片",
+      "Cluster：数据分片 + 自动故障转移",
+      "16384 个哈希槽，CRC16(key) % 16384",
+      "Cluster 不支持跨槽事务"
+    ],
+    "followUp": [
+      "Cluster 的节点通信机制？",
+      "什么是哈希槽？",
+      "怎么扩容 Cluster？"
+    ]
+  },
+  {
+    "id": "ij-rd-06",
+    "category": "redis",
+    "difficulty": "mid",
+    "question": "Redis 为什么这么快？",
+    "answer": "1. 纯内存操作：数据存在内存中，读写速度是磁盘的 10 万倍\n2. 单线程避免上下文切换：没有多线程的锁竞争和上下文切换开销\n3. I/O 多路复用：epoll 同时处理多个连接（单线程处理多连接）\n4. 高效数据结构：SDS、ziplist、skiplist、intset 等专门优化的数据结构\n5. 通信协议简单：RESP 协议简单高效\n\nRedis 6.0 的多线程：\n- 命令执行仍然单线程\n- 网络 I/O（读写数据）使用多线程\n- 瓶颈在网络 I/O 而不是命令执行\n\n为什么不全用多线程？\n- 单线程保证原子性，不需要加锁\n- 代码简单，没有并发问题\n- CPU 不是瓶颈，网络才是",
+    "keyPoints": [
+      "纯内存 + 单线程 + IO 多路复用",
+      "单线程避免锁竞争和上下文切换",
+      "epoll 处理多连接",
+      "6.0 网络 IO 多线程，命令执行仍单线程"
+    ],
+    "followUp": [
+      "什么是 IO 多路复用？",
+      "Redis 6.0 多线程的模型？",
+      "什么是 RESP 协议？"
+    ]
+  },
+  {
+    "id": "ij-rd-07",
+    "category": "redis",
+    "difficulty": "mid",
+    "question": "Redis 的内存淘汰策略？",
+    "answer": "8 种策略（Redis 4.0+）：\n\n不淘汰：\n- noeviction：内存满时拒绝写入（默认）\n\n对所有 key：\n- allkeys-lru：LRU 淘汰最近最少使用的\n- allkeys-lfu：LFU 淘汰最不经常使用的（4.0+）\n- allkeys-random：随机淘汰\n\n对设了过期时间的 key：\n- volatile-lru：LRU 淘汰最近最少使用的\n- volatile-lfu：LFU 淘汰最不经常使用的\n- volatile-random：随机淘汰\n- volatile-ttl：淘汰即将过期的\n\n推荐：\n- 缓存场景：allkeys-lru（热点数据保留）\n- 有过期时间的：volatile-lru 或 volatile-ttl\n- 访问频率差异大：allkeys-lfu",
+    "keyPoints": [
+      "noeviction 默认拒绝写入",
+      "allkeys-lru 淘汰最近最少使用",
+      "volatile 只对有过期时间的 key",
+      "缓存推荐 allkeys-lru"
+    ],
+    "followUp": [
+      "LRU 和 LFU 的区别？",
+      "Redis 的 LRU 是精确的吗？",
+      "什么是近似 LRU？"
+    ]
+  },
+  {
+    "id": "ij-rd-08",
+    "category": "redis",
+    "difficulty": "mid",
+    "question": "Redis 和 MySQL 的数据一致性怎么保证？",
+    "answer": "方案一：先更新 DB，再删缓存\n- 读请求命中缓存返回，未命中查 DB 并写缓存\n- 写请求更新 DB，删缓存\n- 问题：并发读写可能导致不一致\n- 解决：延迟双删（删缓存 → 更新 DB → 延迟再删缓存）\n\n方案二：先删缓存，再更新 DB\n- 问题：删缓存后、更新 DB 前，读请求会把旧值写入缓存\n- 解决：延迟双删\n\n方案三：基于 binlog 异步更新\n- 监听 MySQL binlog（Canal）\n- 异步更新/删除 Redis 缓存\n- 最终一致性\n\n方案四：强一致性（不推荐）\n- 分布式事务（性能差）\n\n推荐：先更新 DB 再删缓存 + 延迟双删 或 binlog 异步更新。",
+    "keyPoints": [
+      "先更新 DB 再删缓存（推荐）",
+      "延迟双删解决并发不一致",
+      "Canal 监听 binlog 异步更新",
+      "最终一致性即可"
+    ],
+    "followUp": [
+      "什么是 Canal？",
+      "什么是延迟双删？",
+      "为什么要删缓存而不是更新缓存？"
+    ]
+  },
+  {
+    "id": "ij-rd-09",
+    "category": "redis",
+    "difficulty": "mid",
+    "question": "什么是 Big Key？怎么发现和处理？",
+    "answer": "Big Key 定义：\n- String 类型 value > 10KB\n- Hash/List/Set/ZSet 元素 > 5000 个\n\n问题：\n1. 读写阻塞其他请求（Redis 单线程）\n2. 网络带宽占用\n3. 集群内存不均衡\n4. DEL 大 Key 阻塞（O(n)）\n5. 过期/驱逐时阻塞\n\n发现：\n- redis-cli --bigkeys 扫描\n- memory usage key 查看单个 key 内存\n- RDB 文件分析工具（rdb-tools）\n\n处理：\n1. 拆分：Hash 拆为多个小 Hash\n2. 压缩：gzip 压缩 value\n3. 异步删除：用 UNLINK 替代 DEL\n4. 渐进删除：HSCAN + HDEL 分批删除\n5. 避免存储大对象",
+    "keyPoints": [
+      "String > 10KB，集合 > 5000 个元素",
+      "阻塞 Redis、网络占用、内存不均",
+      "redis-cli --bigkeys 发现",
+      "UNLINK 异步删除替代 DEL"
+    ],
+    "followUp": [
+      "UNLINK 和 DEL 的区别？",
+      "什么是渐进式删除？",
+      "怎么预防 Big Key？"
+    ]
+  },
+  {
+    "id": "ij-rd-10",
+    "category": "redis",
+    "difficulty": "mid",
+    "question": "Redis 的 Pipeline 和事务的区别？",
+    "answer": "Pipeline：\n- 批量发送多个命令，减少网络 RTT\n- 不是原子操作（命令之间可能插入其他命令）\n- 服务端按顺序执行，但不保证原子性\n- 性能提升明显（10 倍以上）\n\n事务（MULTI/EXEC）：\n- MULTI 开始事务，命令入队\n- EXEC 执行所有入队的命令\n- 原子性：所有命令按顺序执行，不会被打断\n- 不支持回滚（执行失败的命令不影响其他命令）\n- WATCH 乐观锁（CAS）\n\n选择：\n- 批量操作不需要原子性 → Pipeline\n- 需要原子性 → 事务\n- 两者可以结合使用\n\n注意：Redis 事务不支持回滚，和数据库事务不同。",
+    "keyPoints": [
+      "Pipeline 减少 RTT，不是原子操作",
+      "MULTI/EXEC 原子执行，不支持回滚",
+      "WATCH 实现乐观锁",
+      "Pipeline + 事务可以结合"
+    ],
+    "followUp": [
+      "WATCH 的原理？",
+      "Redis 事务为什么不支持回滚？",
+      "什么是 Lua 脚本的原子性？"
+    ]
+  }
+]

@@ -1,0 +1,602 @@
+[
+  {
+    "id": "jvm-01",
+    "dimension": "jvm",
+    "difficulty": "basic",
+    "title": "以下代码会导致什么？\n\npublic class Test {\n    public static void main(String[] args) {\n        recursive();\n    }\n    static void recursive() { recursive(); }\n}",
+    "options": [
+      {
+        "label": "OOM",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "StackOverflowError",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "死循环",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "正常运行",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "无限递归导致虚拟机栈深度超过限制，抛出 StackOverflowError。"
+  },
+  {
+    "id": "jvm-02",
+    "dimension": "jvm",
+    "difficulty": "intermediate",
+    "title": "以下哪种情况对象会直接进入老年代？",
+    "options": [
+      {
+        "label": "对象刚创建",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "对象超过 Survivor 区一半大小",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "对象被 GC 扫描到",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "对象实现了 Serializable",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "大对象直接分配到老年代，避免在 Eden 和 Survivor 之间来回复制。"
+  },
+  {
+    "id": "jvm-03",
+    "dimension": "jvm",
+    "difficulty": "intermediate",
+    "title": "jmap -dump 导出的堆转储文件用什么工具分析？",
+    "options": [
+      {
+        "label": "jstack",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "MAT (Memory Analyzer Tool)",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "jstat",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "arthas",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "b",
+    "explanation": "MAT 是堆转储分析工具，可以查看对象引用链、内存泄漏嫌疑。jstack 分析线程堆栈，jstat 监控 GC。"
+  },
+  {
+    "id": "jvm-04",
+    "dimension": "jvm",
+    "difficulty": "basic",
+    "title": "以下哪个 JVM 参数能打印 GC 日志？",
+    "options": [
+      {
+        "label": "-Xmx2g",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "-Xlog:gc*",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "-XX:+UseG1GC",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "-XX:MaxGCPauseMillis=200",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "JDK9+ 用 -Xlog:gc*。JDK8 用 -XX:+PrintGCDetails。"
+  },
+  {
+    "id": "jvm-05",
+    "dimension": "jvm",
+    "difficulty": "basic",
+    "title": "以下代码创建了几个对象？\n\nString s = new String(\"abc\");",
+    "options": [
+      {
+        "label": "1 个",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "2 个（常量池 + 堆）",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "3 个",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "0 个",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "先在字符串常量池创建 \"abc\"（如果不存在），然后在堆上创建 new String(\"abc\")。"
+  },
+  {
+    "id": "jvm-06",
+    "dimension": "jvm",
+    "difficulty": "advanced",
+    "title": "G1 的 Mixed GC 回收哪些区域？",
+    "options": [
+      {
+        "label": "只回收 Young 区",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "Young 区 + 部分 Old 区",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "只回收 Old 区",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "整个堆",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "Mixed GC 回收所有 Young Region + 一部分收益最高的 Old Region。"
+  },
+  {
+    "id": "jvm-07",
+    "dimension": "jvm",
+    "difficulty": "intermediate",
+    "title": "以下哪个类加载器能加载核心类库？",
+    "options": [
+      {
+        "label": "Application ClassLoader",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "Bootstrap ClassLoader",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "自定义 ClassLoader",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "URLClassLoader",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "Bootstrap ClassLoader 加载核心类库（rt.jar 或 java.base 模块），用 C++ 实现。"
+  },
+  {
+    "id": "jvm-08",
+    "dimension": "jvm",
+    "difficulty": "intermediate",
+    "title": "以下哪种情况会触发类的初始化？",
+    "options": [
+      {
+        "label": "通过 Class.forName() 加载类",
+        "value": "a",
+        "score": 4
+      },
+      {
+        "label": "通过 ClassLoader.loadClass() 加载类",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "引用类的常量",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "创建数组",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "a",
+    "explanation": "Class.forName() 默认会触发初始化。ClassLoader.loadClass() 只加载不初始化。"
+  },
+  {
+    "id": "jvm-09",
+    "dimension": "jvm",
+    "difficulty": "advanced",
+    "title": "JVM 的 safepoint 是什么？",
+    "options": [
+      {
+        "label": "安全的代码位置，GC 时线程需要到达 safepoint 才能暂停",
+        "value": "a",
+        "score": 4
+      },
+      {
+        "label": "安全的内存地址",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "线程同步点",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "异常处理点",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "a",
+    "explanation": "Safepoint 是线程可以安全暂停的位置（如方法调用、循环回边）。GC 时需要所有线程到达 safepoint。"
+  },
+  {
+    "id": "jvm-10",
+    "dimension": "jvm",
+    "difficulty": "intermediate",
+    "title": "以下哪个工具可以在线上不停机诊断 JVM 问题？",
+    "options": [
+      {
+        "label": "jmap",
+        "value": "a",
+        "score": 2
+      },
+      {
+        "label": "jstack",
+        "value": "b",
+        "score": 2
+      },
+      {
+        "label": "Arthas",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "VisualVM",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "c",
+    "explanation": "Arthas 支持在线反编译、监控方法调用、trace 调用链，不需要重启应用。"
+  },
+  {
+    "id": "jvm-11",
+    "dimension": "jvm",
+    "difficulty": "basic",
+    "title": "JVM 运行时数据区中，哪个区域不会发生 OOM？",
+    "options": [
+      {
+        "label": "堆",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "程序计数器",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "方法区",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "虚拟机栈",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "程序计数器是唯一不会 OOM 的区域，只存当前线程执行的字节码行号。"
+  },
+  {
+    "id": "jvm-12",
+    "dimension": "jvm",
+    "difficulty": "intermediate",
+    "title": "强引用置为 null 后，对象一定会被 GC 回收吗？",
+    "options": [
+      {
+        "label": "是的，立即回收",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "不一定，需要等到 GC 执行且对象不可达时才回收",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "永远不会回收",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "取决于对象大小",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "置为 null 只是断开引用，对象变为不可达。但 GC 是自动的，只有 GC 执行时才会回收。"
+  },
+  {
+    "id": "jvm-13",
+    "dimension": "jvm",
+    "difficulty": "advanced",
+    "title": "逃逸分析不包括以下哪种优化？",
+    "options": [
+      {
+        "label": "栈上分配",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "标量替换",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "锁消除",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "类卸载",
+        "value": "d",
+        "score": 4
+      }
+    ],
+    "answer": "d",
+    "explanation": "逃逸分析的优化：栈上分配、标量替换、锁消除。类卸载是 GC 的功能。"
+  },
+  {
+    "id": "jvm-14",
+    "dimension": "jvm",
+    "difficulty": "intermediate",
+    "title": "以下哪种引用类型在下次 GC 时一定会被回收？",
+    "options": [
+      {
+        "label": "强引用",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "软引用",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "弱引用",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "虚引用",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "c",
+    "explanation": "弱引用在下次 GC 时一定会被回收，无论内存是否充足。"
+  },
+  {
+    "id": "jvm-15",
+    "dimension": "jvm",
+    "difficulty": "intermediate",
+    "title": "类加载的「准备」阶段做什么？",
+    "options": [
+      {
+        "label": "加载 .class 文件到内存",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "为类变量分配内存并设为零值",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "执行 static 代码块",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "解析符号引用",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "准备阶段为类变量分配内存并设零值（int→0, boolean→false）。初始化阶段才设初始值。"
+  },
+  {
+    "id": "jvm-16",
+    "dimension": "jvm",
+    "difficulty": "advanced",
+    "title": "ZGC 的目标停顿时间是？",
+    "options": [
+      {
+        "label": "不超过 100ms",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "不超过 10ms",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "不超过 1ms",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "没有停顿",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "ZGC 目标停顿时间不超过 10ms，且不随堆大小增长。支持 8MB 到 16TB 的堆。"
+  },
+  {
+    "id": "jvm-17",
+    "dimension": "jvm",
+    "difficulty": "intermediate",
+    "title": "以下哪个不会触发 Full GC？",
+    "options": [
+      {
+        "label": "老年代空间不足",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "调用 System.gc()",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "Young GC 后存活对象无法放入 Survivor",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "方法区空间不足",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "Young GC 后存活对象放不进 Survivor 会直接进入老年代（分配担保），不一定触发 Full GC。"
+  },
+  {
+    "id": "jvm-18",
+    "dimension": "jvm",
+    "difficulty": "advanced",
+    "title": "CDS（Class Data Sharing）的作用是？",
+    "options": [
+      {
+        "label": "类加密",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "共享类的元数据，加速启动和减少内存",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "类的远程加载",
+        "value": "c",
+        "score": 1
+      },
+      {
+        "label": "动态代理",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "b",
+    "explanation": "CDS 将类的元数据预处理为共享归档文件，多个 JVM 实例共享，减少启动时间和内存。"
+  },
+  {
+    "id": "jvm-19",
+    "dimension": "jvm",
+    "difficulty": "intermediate",
+    "title": "G1 收集器的 Region 类型不包括以下哪种？",
+    "options": [
+      {
+        "label": "Eden",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "Survivor",
+        "value": "b",
+        "score": 1
+      },
+      {
+        "label": "Tenured",
+        "value": "c",
+        "score": 4
+      },
+      {
+        "label": "Humongous",
+        "value": "d",
+        "score": 1
+      }
+    ],
+    "answer": "c",
+    "explanation": "G1 的 Region 类型是 Eden、Survivor、Old、Humongous。没有 Tenured 这个概念。"
+  },
+  {
+    "id": "jvm-20",
+    "dimension": "jvm",
+    "difficulty": "basic",
+    "title": "排查线上 CPU 100% 的第一步是什么？",
+    "options": [
+      {
+        "label": "重启服务",
+        "value": "a",
+        "score": 1
+      },
+      {
+        "label": "top 命令找到 CPU 最高的 Java 进程 PID",
+        "value": "b",
+        "score": 4
+      },
+      {
+        "label": "看 GC 日志",
+        "value": "c",
+        "score": 2
+      },
+      {
+        "label": "jstack 导出堆栈",
+        "value": "d",
+        "score": 2
+      }
+    ],
+    "answer": "b",
+    "explanation": "标准步骤：top → 找 PID → top -Hp PID → 找 TID → printf \"%x\" TID → jstack PID | grep TID。"
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "id": "ij-my-01",
+    "category": "mysql",
+    "difficulty": "mid",
+    "question": "MySQL 索引的底层数据结构？为什么用 B+ 树？",
+    "answer": "InnoDB 使用 B+ 树作为索引结构。\n\nB+ 树特点：\n1. 非叶子节点只存索引，不存数据 → 树更矮 → 减少 IO\n2. 叶子节点存数据，用双向链表连接 → 范围查询高效\n3. 所有查询都到叶子节点 → 查询性能稳定\n\n为什么不用其他结构：\n- 哈希表：只支持等值查询，不支持范围查询\n- 二叉树/红黑树：树太高，IO 次数多\n- B 树：非叶子节点也存数据，树更高\n\n聚簇索引 vs 非聚簇索引：\n- 聚簇索引（主键索引）：叶子节点存完整行数据\n- 非聚簇索引（二级索引）：叶子节点存主键值 → 需要回表\n\n覆盖索引：查询的列都在索引中，不需要回表。EXPLAIN 中 Extra 显示 Using index。",
+    "keyPoints": [
+      "B+ 树：非叶子节点只存索引，叶子节点双向链表",
+      "聚簇索引存完整行，二级索引存主键值",
+      "回表：二级索引查到主键再查聚簇索引",
+      "覆盖索引不需要回表"
+    ],
+    "followUp": [
+      "什么是索引下推（ICP）？",
+      "什么情况下索引会失效？",
+      "联合索引的最左前缀原则？"
+    ]
+  },
+  {
+    "id": "ij-my-02",
+    "category": "mysql",
+    "difficulty": "mid",
+    "question": "MySQL 的事务隔离级别？InnoDB 怎么实现的？",
+    "answer": "四种隔离级别：\n1. READ UNCOMMITTED：可能脏读、不可重复读、幻读\n2. READ COMMITTED（RC）：解决脏读\n3. REPEATABLE READ（RR，默认）：解决脏读、不可重复读\n4. SERIALIZABLE：解决所有问题，性能最差\n\nInnoDB 实现：\n- MVCC（多版本并发控制）：\n  - 每行有隐藏列：trx_id（事务 ID）、roll_pointer（undo log 指针）\n  - undo log 形成版本链\n  - ReadView 判断哪个版本对当前事务可见\n  - RC 每次读创建新 ReadView，RR 只在第一次读创建\n\n- 锁：\n  - 记录锁（Record Lock）：锁住单行\n  - 间隙锁（Gap Lock）：锁住范围（防止幻读）\n  - 临键锁（Next-Key Lock）：记录锁 + 间隙锁\n\nRR 级别下：快照读通过 MVCC 避免幻读，当前读通过 Next-Key Lock 避免。",
+    "keyPoints": [
+      "RC 解决脏读，RR 解决不可重复读（默认）",
+      "MVCC：undo log 版本链 + ReadView",
+      "RC 每次读创建 ReadView，RR 只第一次",
+      "Next-Key Lock = 记录锁 + 间隙锁"
+    ],
+    "followUp": [
+      "什么是快照读和当前读？",
+      "ReadView 的组成？",
+      "RC 和 RR 下 MVCC 的区别？"
+    ]
+  },
+  {
+    "id": "ij-my-03",
+    "category": "mysql",
+    "difficulty": "mid",
+    "question": "MySQL 的锁机制？什么时候会加锁？",
+    "answer": "锁类型：\n1. 全局锁：FTWRL（Flush Tables With Read Lock），整个数据库只读\n2. 表级锁：表锁、MDL（元数据锁）、意向锁\n3. 行级锁：记录锁、间隙锁、临键锁\n\n加锁时机：\n- SELECT：快照读不加锁（MVCC），当前读加共享锁\n- SELECT FOR UPDATE：加排他锁\n- SELECT LOCK IN SHARE MODE：加共享锁\n- INSERT/UPDATE/DELETE：加排他锁\n- RR 级别下范围查询会加间隙锁\n\n死锁：\n- 两个事务互相等待对方释放锁\n- 解决：固定顺序加锁、设置锁等待超时（innodb_lock_wait_timeout）\n- 检测：InnoDB 有死锁检测，自动回滚代价小的事务\n\n优化：\n- 尽量使用索引加锁（避免锁表）\n- 减小事务范围\n- 降低隔离级别（RC 无间隙锁）",
+    "keyPoints": [
+      "全局锁、表级锁、行级锁",
+      "SELECT FOR UPDATE 加排他锁",
+      "RR 级别范围查询加间隙锁",
+      "InnoDB 自动检测死锁"
+    ],
+    "followUp": [
+      "什么是意向锁？",
+      "间隙锁的作用？",
+      "RC 和 RR 下锁的区别？"
+    ]
+  },
+  {
+    "id": "ij-my-04",
+    "category": "mysql",
+    "difficulty": "mid",
+    "question": "怎么优化慢 SQL？",
+    "answer": "1. 开启慢查询日志：\n   SET GLOBAL slow_query_log = ON;\n   SET GLOBAL long_query_time = 1;\n\n2. EXPLAIN 分析执行计划：\n   - type：访问类型（const > eq_ref > ref > range > index > ALL）\n   - key：使用的索引\n   - rows：扫描行数\n   - Extra：Using index（覆盖索引）、Using filesort（文件排序）、Using temporary（临时表）\n\n3. 优化策略：\n   - 建立合适的索引\n   - 避免 SELECT *（只查需要的列）\n   - 避免在 WHERE 中对索引列做函数运算\n   - 小表驱动大表\n   - LIMIT 大偏移用游标分页（WHERE id > ? LIMIT 10）\n   - 避免 OR（用 UNION 代替）\n   - 避免 != 和 NOT IN（可能不走索引）\n   - JOIN 不超过 3 个表\n\n4. 大表优化：\n   - 读写分离\n   - 分库分表\n   - 冗余字段（空间换时间）",
+    "keyPoints": [
+      "EXPLAIN 看 type、key、rows、Extra",
+      "type 至少要 range 级别",
+      "避免 SELECT * 和索引列函数运算",
+      "LIMIT 大偏移用游标分页"
+    ],
+    "followUp": [
+      "什么是索引跳跃扫描？",
+      "什么是 MRR（Multi-Range Read）？",
+      "什么是 ICP（Index Condition Pushdown）？"
+    ]
+  },
+  {
+    "id": "ij-my-05",
+    "category": "mysql",
+    "difficulty": "senior",
+    "question": "分库分表的方案和问题？",
+    "answer": "分库分表方式：\n1. 垂直分库：按业务拆分（用户库、订单库、商品库）\n2. 垂直分表：大表拆小表（将不常用的字段拆到扩展表）\n3. 水平分库：同一张表的数据按规则分到多个库\n4. 水平分表：同一张表的数据按规则分到多个表\n\n分片策略：\n- 范围分片：按时间或 ID 范围（可能数据不均）\n- 哈希分片：取模（数据均匀，但扩容困难）\n- 一致性哈希：扩容时只迁移部分数据\n\n带来的问题：\n1. 分布式事务：Seata、TCC、本地消息表\n2. 跨库 JOIN：冗余数据、应用层组装、宽表\n3. 全局唯一 ID：雪花算法、号段模式\n4. 跨库排序分页：各分片查询后归并\n5. 扩容：一致性哈希、提前规划\n\n中间件：ShardingSphere、MyCat。",
+    "keyPoints": [
+      "垂直分（按业务/字段）、水平分（按数据）",
+      "范围分片、哈希分片、一致性哈希",
+      "分布式事务、跨库 JOIN、全局 ID 是核心问题",
+      "ShardingSphere 是主流中间件"
+    ],
+    "followUp": [
+      "什么时候该分库分表？",
+      "怎么不停机迁移分库分表？",
+      "雪花算法的原理？"
+    ]
+  },
+  {
+    "id": "ij-my-06",
+    "category": "mysql",
+    "difficulty": "mid",
+    "question": "MySQL 的主从复制原理？怎么解决延迟？",
+    "answer": "主从复制流程：\n1. Master 将数据变更写入 binlog\n2. Slave 的 IO 线程读取 Master 的 binlog，写入 relay log\n3. Slave 的 SQL 线程读取 relay log，重放 SQL\n\n三种格式：\n- Statement：记录 SQL 语句（可能主从不一致）\n- Row：记录行变化（数据量大但准确）\n- Mixed：自动选择\n\n延迟原因：\n- 从库单线程重放（SQL 线程）\n- 主库大事务\n- 从库性能差\n\n解决方案：\n1. 并行复制（MySQL 5.7+ 的 multi-threaded slave）\n2. 半同步复制（至少一个从库确认）\n3. 关键读强制走主库\n4. 增加从库性能\n5. 业务层接受短暂不一致",
+    "keyPoints": [
+      "Master binlog → Slave IO 线程 → relay log → SQL 线程",
+      "Row 格式最准确",
+      "从库单线程是延迟主因",
+      "并行复制 + 半同步复制"
+    ],
+    "followUp": [
+      "什么是 GTID 复制？",
+      "什么是半同步复制？",
+      "怎么实现读写分离？"
+    ]
+  },
+  {
+    "id": "ij-my-07",
+    "category": "mysql",
+    "difficulty": "mid",
+    "question": "InnoDB 和 MyISAM 的区别？",
+    "answer": "1. 事务：InnoDB 支持事务，MyISAM 不支持\n2. 锁：InnoDB 支持行级锁，MyISAM 只有表级锁\n3. 外键：InnoDB 支持外键，MyISAM 不支持\n4. MVCC：InnoDB 支持 MVCC，MyISAM 不支持\n5. 崩溃恢复：InnoDB 有 redo log 支持崩溃恢复，MyISAM 不支持\n6. 索引：InnoDB 是聚簇索引，MyISAM 是非聚簇索引\n7. 存储：InnoDB 存在 .ibd 文件，MyISAM 存在 .MYD + .MYI 文件\n8. COUNT(*)：MyISAM 有专门的计数器（快），InnoDB 需要遍历\n9. 全文索引：MyISAM 原生支持，InnoDB 5.6+ 支持\n\n选择：99% 用 InnoDB。MyISAM 只适合读多写少、不需要事务的场景。",
+    "keyPoints": [
+      "InnoDB 支持事务、行锁、MVCC、外键",
+      "MyISAM 只有表锁，不支持事务",
+      "InnoDB 聚簇索引，MyISAM 非聚簇索引",
+      "99% 用 InnoDB"
+    ],
+    "followUp": [
+      "InnoDB 的 redo log 和 undo log 的区别？",
+      "什么是 WAL（Write-Ahead Logging）？",
+      "InnoDB 的 Buffer Pool？"
+    ]
+  },
+  {
+    "id": "ij-my-08",
+    "category": "mysql",
+    "difficulty": "mid",
+    "question": "什么是联合索引？最左前缀原则？",
+    "answer": "联合索引：多个字段组成的索引，如 (a, b, c)。\n\n最左前缀原则：查询条件必须从最左列开始匹配，不能跳过中间列。\n\n能命中：\n- WHERE a = 1\n- WHERE a = 1 AND b = 2\n- WHERE a = 1 AND b = 2 AND c = 3\n- WHERE a = 1 AND c = 3（只用到 a）\n\n不能命中：\n- WHERE b = 2\n- WHERE c = 3\n- WHERE b = 2 AND c = 3\n\n原理：联合索引的 B+ 树按 a→b→c 顺序排序。只有 a 相同时才按 b 排序，a、b 相同时才按 c 排序。\n\n索引跳跃扫描（MySQL 8.0+）：\n- 对于 WHERE b = 2，如果 a 的基数很小，可以跳过 a 使用索引\n\n覆盖索引：如果 SELECT 的列都在索引中，不需要回表。",
+    "keyPoints": [
+      "联合索引按字段顺序排序",
+      "最左前缀原则：不能跳过中间列",
+      "WHERE a=1 AND c=3 只用到 a",
+      "MySQL 8.0 有索引跳跃扫描"
+    ],
+    "followUp": [
+      "索引列的顺序怎么选择？",
+      "什么是索引选择性？",
+      "什么是前缀索引？"
+    ]
+  },
+  {
+    "id": "ij-my-09",
+    "category": "mysql",
+    "difficulty": "mid",
+    "question": "MySQL 的 binlog、redo log、undo log 的区别？",
+    "answer": "1. binlog（归档日志）：\n   - Server 层产生，所有引擎都有\n   - 记录 SQL 语句或行变化\n   - 用于主从复制和数据恢复\n   - 追加写入，不会覆盖\n\n2. redo log（重做日志）：\n   - InnoDB 引擎特有\n   - 记录数据页的物理修改\n   - WAL（Write-Ahead Logging）：先写 redo log 再写数据页\n   - 循环写入，空间固定\n   - 用于崩溃恢复（保证事务持久性）\n\n3. undo log（回滚日志）：\n   - InnoDB 引擎特有\n   - 记录数据修改前的值\n   - 用于事务回滚和 MVCC\n   - 逻辑日志\n\n两阶段提交：\n- prepare 阶段：写 redo log\n- commit 阶段：写 binlog\n- 保证 redo log 和 binlog 一致",
+    "keyPoints": [
+      "binlog Server 层，redo/undo log InnoDB 层",
+      "redo log WAL 保证崩溃恢复",
+      "undo log 用于回滚和 MVCC",
+      "两阶段提交保证一致性"
+    ],
+    "followUp": [
+      "什么是两阶段提交？",
+      "redo log 的写入流程？",
+      "binlog 的三种格式？"
+    ]
+  },
+  {
+    "id": "ij-my-10",
+    "category": "mysql",
+    "difficulty": "mid",
+    "question": "MySQL 中 COUNT(*)、COUNT(1)、COUNT(主键) 的区别？",
+    "answer": "InnoDB 中：\n- COUNT(*)：优化器选择最小的索引树遍历，不取值\n- COUNT(1)：和 COUNT(*) 基本一样，不取值，1 不为 NULL 所以都计数\n- COUNT(主键)：遍历索引，取出主键值判断不为 NULL\n- COUNT(字段)：遍历索引，取出字段值判断不为 NULL（不统计 NULL）\n\n性能：COUNT(*) ≈ COUNT(1) > COUNT(主键) > COUNT(字段)\n\n为什么 InnoDB COUNT(*) 慢？\n- MyISAM 有专门的计数器，直接返回\n- InnoDB 支持 MVCC，每个事务看到的数据可能不同，需要遍历\n\n优化：\n- 用缓存维护计数（Redis）\n- 用额外的计数表\n- 近似值：EXPLAIN 的 rows",
+    "keyPoints": [
+      "COUNT(*) ≈ COUNT(1)，不取值",
+      "COUNT(字段) 不统计 NULL",
+      "InnoDB MVCC 导致 COUNT(*) 需要遍历",
+      "用缓存或计数表优化"
+    ],
+    "followUp": [
+      "为什么 InnoDB 不像 MyISAM 一样维护计数器？",
+      "怎么实现精确的 COUNT？",
+      "什么是近似 COUNT？"
+    ]
+  }
+]
