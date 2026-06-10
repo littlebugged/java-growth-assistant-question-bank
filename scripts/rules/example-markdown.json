@@ -1,0 +1,32 @@
+{
+  "name": "Markdown 示例规则",
+  "description": "演示如何清洗 Markdown 格式的面试题（按标题分割）",
+  "source": {
+    "repo": "https://github.com/example/java-notes",
+    "path": "docs/interview/",
+    "filePattern": "*.md",
+    "format": "markdown"
+  },
+  "target": {
+    "type": "interview",
+    "outputDir": "interview",
+    "filename": "example-markdown.json",
+    "idPrefix": "em-"
+  },
+  "mapping": {
+    "question": { "source": "title" },
+    "answer": { "source": "content" },
+    "category": { "source": "fixed", "value": "java" },
+    "difficulty": { "source": "fixed", "value": "mid" },
+    "keyPoints": { "source": "fixed", "value": "[]" },
+    "followUp": { "source": "fixed", "value": "[]" }
+  },
+  "filters": [
+    { "field": "question", "minLength": 5 },
+    { "field": "answer", "minLength": 20 }
+  ],
+  "dedup": {
+    "field": "question",
+    "strategy": "keep-first"
+  }
+}

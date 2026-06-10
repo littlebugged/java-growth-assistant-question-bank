@@ -1,0 +1,56 @@
+{
+  "name": "JSON 示例规则",
+  "description": "演示如何清洗标准 JSON 格式的面试题（字段名不同但结构类似）",
+  "source": {
+    "repo": "https://github.com/example/interview-questions",
+    "path": "data/",
+    "filePattern": "*.json",
+    "format": "json"
+  },
+  "target": {
+    "type": "interview",
+    "outputDir": "interview",
+    "filename": "example-json.json",
+    "idPrefix": "ej-"
+  },
+  "mapping": {
+    "id": { "source": "id" },
+    "question": { "source": "title" },
+    "answer": { "source": "answer" },
+    "category": {
+      "source": "map",
+      "field": "tag",
+      "values": {
+        "Java": "java",
+        "JVM": "jvm",
+        "多线程": "concurrency",
+        "Spring": "spring",
+        "MySQL": "mysql",
+        "Redis": "redis",
+        "分布式": "distributed",
+        "网络": "network"
+      },
+      "default": "java"
+    },
+    "difficulty": {
+      "source": "map",
+      "field": "level",
+      "values": {
+        "简单": "junior",
+        "中等": "mid",
+        "困难": "senior"
+      },
+      "default": "mid"
+    },
+    "keyPoints": { "source": "fixed", "value": "[]" },
+    "followUp": { "source": "fixed", "value": "[]" }
+  },
+  "filters": [
+    { "field": "question", "minLength": 5 },
+    { "field": "answer", "minLength": 10 }
+  ],
+  "dedup": {
+    "field": "question",
+    "strategy": "keep-first"
+  }
+}

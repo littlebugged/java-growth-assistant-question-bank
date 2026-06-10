@@ -1,0 +1,34 @@
+{
+  "name": "question-bank",
+  "version": "1.0.0",
+  "description": "Java 成长助手客户端的远程题库数据仓库。",
+  "main": "index.js",
+  "scripts": {
+    "clean": "tsx scripts/clean.ts",
+    "clean:all": "tsx scripts/clean.ts --all",
+    "clean:push": "tsx scripts/clean.ts --all && git add -A && git commit -m 'chore: 更新题库数据' && git push"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/littlebugged/java-growth-assistant-question-bank.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/littlebugged/java-growth-assistant-question-bank/issues"
+  },
+  "homepage": "https://github.com/littlebugged/java-growth-assistant-question-bank#readme",
+  "dependencies": {
+    "glob": "^13.0.6",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.9.2",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  }
+}

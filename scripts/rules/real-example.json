@@ -1,0 +1,36 @@
+{
+  "name": "实战示例 - 通用 JSON 格式",
+  "description": "适用于大部分 JSON 格式的面试题仓库，字段名只需微调",
+  "source": {
+    "repo": "https://github.com/haizlin/fe-interview",
+    "path": "lib/data/",
+    "filePattern": "*.json",
+    "format": "json"
+  },
+  "target": {
+    "type": "interview",
+    "outputDir": "interview",
+    "filename": "real-example.json",
+    "idPrefix": "re-"
+  },
+  "mapping": {
+    "question": { "source": "question" },
+    "answer": { "source": "answer" },
+    "category": { "source": "fixed", "value": "java" },
+    "difficulty": { "source": "fixed", "value": "mid" },
+    "keyPoints": {
+      "source": "extract",
+      "field": "answer",
+      "pattern": "^[-•]\\s+(.+)$"
+    },
+    "followUp": { "source": "fixed", "value": "[]" }
+  },
+  "filters": [
+    { "field": "question", "minLength": 10 },
+    { "field": "answer", "minLength": 30 }
+  ],
+  "dedup": {
+    "field": "question",
+    "strategy": "keep-first"
+  }
+}
